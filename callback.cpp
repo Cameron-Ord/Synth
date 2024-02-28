@@ -1,7 +1,6 @@
 #include "inc/main.hpp"
 #include <SDL2/SDL_stdinc.h>
 #include <cstdint>
-#include <cstring>
 #include <math.h>
 
 void audio_callback(void *userdata, Uint8 *stream, int length) {
@@ -15,11 +14,11 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
     double sample = 0.0;
     int notes_playing = 0;
     for (int note = 0; note < NOTES; note++) {
+      note_samples[note] = 0.0;
       if (SC->playing[note]) {
         double freq = SC->frequency[note];
-        double sawtooth = fmod(2 * time * 293.11, 2.0) - 1.0;
-
-        note_samples[note] = sawtooth;
+        double sine = sin(2 * M_PI * freq * time);
+        note_samples[note] = sine;
         notes_playing += 1;
       } else {
         note_samples[note] = 0.0;
@@ -27,9 +26,16 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
       sample += note_samples[note];
     }
     if (notes_playing > 0) {
-      double scaled_sample = sample * (INT16_MAX / notes_playing);
+      double scaled_sample = sample * INT16_MAX;
       Sint16 casted_sample = static_cast<Sint16>(scaled_sample);
-      stream_ptr[i] = casted_sample;
+      stream_ptr[i] = abs(casted_sample);
+
+      if (stream_ptr[i] > INT16_MAX) {
+        stream_ptr[i] = INT16_MAX;
+      } else if (stream_ptr[i] < INT16_MIN) {
+        stream_ptr[i] = INT16_MIN;
+      }
+
     } else {
       stream_ptr[i] = 0;
     }

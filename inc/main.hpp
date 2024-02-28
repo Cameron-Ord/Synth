@@ -13,7 +13,7 @@
 #define WIDTH 800
 #define NOTES 12
 #define SAMPLERATE 44100
-#define BUFFERSIZE 256
+#define BUFFERSIZE 512
 
 typedef enum {
   Q = SDL_SCANCODE_Q,

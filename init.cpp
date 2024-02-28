@@ -49,12 +49,16 @@ Synth::~Synth() {
 }
 
 void Synth::setup_inputs() {
-  double f[] = {130.81 * 2, 138.59 * 2, 146.83 * 2, 155.56, 164.81, 174.61,
-                185.00,     196.00,     207.65,     220.00, 233.08, 246.94};
+  double f[] = {130.81, 138.59, 146.83, 155.56, 164.81, 174.61,
+                185.00, 196.00, 207.65, 220.00, 233.08, 246.94};
 
   this->frequency = new double[NOTES];
   this->playing = new int[NOTES];
-  memcpy(this->frequency, f, sizeof(double) * NOTES);
+
+  for (int k = 0; k < NOTES; k++) {
+    this->frequency[k] = f[k];
+  }
+
   for (int i = 0; i < NOTES; i++) {
     this->playing[i] = 0;
   }
