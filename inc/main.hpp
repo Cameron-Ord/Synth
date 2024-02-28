@@ -36,7 +36,7 @@ class Synth {
 public:
   Synth();
   ~Synth();
-  int init_sdl();
+
   int init_audio();
   void define_keymaps();
   void run_main_loop();
@@ -44,8 +44,11 @@ public:
   void setup_inputs();
   void key_down(int SCANCODE);
   void key_up(int SCANCODE);
-  int playing[NOTES];
-  double frequency[NOTES];
+  int create_window();
+  int create_renderer();
+  int *playing;
+  double *frequency;
+  int *KM;
 
 private:
   SDL_Window *w;
@@ -54,5 +57,4 @@ private:
   SDL_AudioDeviceID device;
   int running;
   int startup_flag;
-  int KM[NOTES];
 };

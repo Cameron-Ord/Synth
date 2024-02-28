@@ -1,4 +1,5 @@
 #include "inc/operations.hpp"
+#include <cstdio>
 
 void swap(int *a, int *b) {
   int t = *a;
@@ -29,7 +30,7 @@ void quicksort(int *map, int low, int high) {
 
 int find_key_pressed(int *enumlist, int target) {
   int left = 0;
-  int right = 23;
+  int right = 11;
   while (left <= right) {
     int middle = left + (right - left) / 2;
     if (enumlist[middle] == target) {

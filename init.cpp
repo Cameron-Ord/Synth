@@ -5,20 +5,27 @@
 #include <SDL2/SDL_video.h>
 
 Synth::Synth() {
+  this->define_keymaps();
+  this->setup_inputs();
   this->running = 0;
   this->startup_flag = 0;
   int err;
-  err = this->init_sdl();
+  this->w = NULL;
+  err = this->create_window();
   if (err < 0) {
     startup_flag = -1;
   }
+  this->r = NULL;
+  err = this->create_renderer();
+  if (err < 0) {
+    startup_flag = -1;
+  }
+
   err = this->init_audio();
   if (err < 0) {
     startup_flag = -1;
   }
   if (this->startup_flag == 0) {
-    this->define_keymaps();
-    this->setup_inputs();
     SDL_PauseAudioDevice(this->device, 0);
     SDL_PauseAudio(0);
     this->running = 1;
@@ -36,34 +43,42 @@ Synth::~Synth() {
     SDL_CloseAudioDevice(this->device);
   }
   SDL_CloseAudio();
+  delete[] this->frequency;
+  delete[] this->playing;
+  delete[] this->KM;
 }
 
 void Synth::setup_inputs() {
-  double f[] = {130.81, 138.59, 146.83, 155.56, 164.81, 174.61,
-                185.00, 196.00, 207.65, 220.00, 233.08, 246.94};
+  double f[] = {130.81 * 2, 138.59 * 2, 146.83 * 2, 155.56, 164.81, 174.61,
+                185.00,     196.00,     207.65,     220.00, 233.08, 246.94};
+
+  this->frequency = new double[NOTES];
+  this->playing = new int[NOTES];
   memcpy(this->frequency, f, sizeof(double) * NOTES);
-  memset(this->playing, 0, sizeof(int) * NOTES);
+  for (int i = 0; i < NOTES; i++) {
+    this->playing[i] = 0;
+  }
 }
 
 void Synth::define_keymaps() {
   int KEYMAPS[] = {Q, W, E, A, S, D, J, K, L, U, I, O};
+  this->KM = new int[NOTES];
+
   memcpy(this->KM, KEYMAPS, sizeof(int) * NOTES);
   quicksort(this->KM, 0, 11);
 }
 
-int Synth::init_sdl() {
-  if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
-    SDL_Log("Unable to init SDL2 %s", SDL_GetError());
-    return -1;
-  }
-
+int Synth::create_window() {
   this->w = SDL_CreateWindow("Synth", SDL_WINDOWPOS_CENTERED,
                              SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
   if (!this->w) {
     SDL_Log("Failed to create window! %s", SDL_GetError());
     return -1;
   }
+  return 0;
+}
 
+int Synth::create_renderer() {
   this->r = SDL_CreateRenderer(
       this->w, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   if (!this->r) {
