@@ -1,10 +1,9 @@
 #include "inc/main.hpp"
+#include "inc/synths.hpp"
 #include <SDL2/SDL_stdinc.h>
 #include <cmath>
 #include <cstdint>
 #include <math.h>
-
-double distort(double in, double amount) { return tanh(in * amount); }
 
 void audio_callback(void *userdata, Uint8 *stream, int length) {
   Synth *SC = (Synth *)userdata;
@@ -34,12 +33,6 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
       note_samples[note] = 0.0;
       if (SC->playing[note] && playing_flag) {
         double freq = SC->frequency[note];
-        double phase = fmod(time * freq, 1.0);
-        double sawtooth = 2.0 * phase - 1.0;
-        // double sine = sin(2.0 * M_PI * freq * time);
-        //  double square = fmod(sin(2 * M_PI * freq * time), 1.0) > 0 ? 1.0 :
-        //  -1.0; double envelope = 1.0 - fabs(time - note_timer - note_duration
-        //  / 2) / (note_duration / 2);
         double NT = fmod(time - note_timer, note_duration);
         double envelope = 0.0;
         if (NT < SC->AT) {
@@ -52,7 +45,8 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
           envelope = (note_duration - NT) / SC->RT;
         }
 
-        double package = distort(sawtooth, 0.75);
+        double wave = triangle(freq, time);
+        double package = distort(wave, 0.75);
         note_samples[note] = package * envelope;
         notes_playing += 1;
         sum += note_samples[note];
