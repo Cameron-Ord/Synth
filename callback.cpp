@@ -4,24 +4,19 @@
 #include <cstdint>
 #include <math.h>
 
-const double AT = 0.15;
-const double DT = 0.3;
-const double SL = 0.8;
-const double RT = 0.3;
-
 double distort(double in, double amount) { return tanh(in * amount); }
 
 void audio_callback(void *userdata, Uint8 *stream, int length) {
   Synth *SC = (Synth *)userdata;
   Sint16 *stream_ptr = reinterpret_cast<Sint16 *>(stream);
   Sint16 intermediary_buffer[BUFFERSIZE];
-  double t = 1.0 / SAMPLERATE;
+
   static double time = 0.0;
   static double note_timer = 0.0;
   double note_samples[NOTES];
-  int tempo = 120;
-  double total_duration = 60.0 / tempo;
-  double note_duration = 60.0 / tempo * 0.5;
+
+  double total_duration = 60.0 / SC->tempo;
+  double note_duration = 60.0 / SC->tempo * SC->note_notation;
   double AMP_MAX = 1.0;
   double amp = 1.0;
 
@@ -47,14 +42,14 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
         //  / 2) / (note_duration / 2);
         double NT = fmod(time - note_timer, note_duration);
         double envelope = 0.0;
-        if (NT < AT) {
-          envelope = NT / AT;
-        } else if (NT < AT + DT) {
-          envelope = 1.0 - (NT - AT) / DT * (1.0 - SL);
-        } else if (NT < note_duration - RT) {
-          envelope = SL;
+        if (NT < SC->AT) {
+          envelope = NT / SC->AT;
+        } else if (NT < SC->AT + SC->DT) {
+          envelope = 1.0 - (NT - SC->AT) / SC->DT * (1.0 - SC->SL);
+        } else if (NT < note_duration - SC->RT) {
+          envelope = SC->SL;
         } else {
-          envelope = (note_duration - NT) / RT;
+          envelope = (note_duration - NT) / SC->RT;
         }
 
         double package = distort(sawtooth, 0.75);
@@ -92,7 +87,7 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
       stream_ptr[i] = 0;
     }
 
-    time += t;
+    time += SC->t;
     if (time >= note_timer + note_duration) {
       note_timer += note_duration;
     }

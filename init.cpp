@@ -9,7 +9,7 @@ Synth::Synth() {
   this->define_keymaps();
   this->setup_inputs();
   this->set_default_buffer();
-
+  this->create_default_settings();
   this->running = 0;
   this->startup_flag = 0;
   this->render_flag = 0;
@@ -55,6 +55,17 @@ Synth::~Synth() {
   delete[] this->frequency;
   delete[] this->playing;
   delete[] this->KM;
+}
+
+void Synth::create_default_settings() {
+  this->AT = 0.15;
+  this->DT = 0.3;
+  this->SL = 0.8;
+  this->RT = 0.3;
+
+  this->t = 1.0 / SAMPLERATE;
+  this->note_notation = 0.5;
+  this->tempo = 120;
 }
 
 void Synth::set_default_buffer() {

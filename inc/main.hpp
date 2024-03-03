@@ -57,11 +57,20 @@ public:
   int create_window();
   int create_renderer();
   void set_default_buffer();
+  void create_default_settings();
   int render_flag;
   int *playing;
   double *frequency;
   int *KM;
   Sint16 BUFFER_DATA[BUFFERSIZE];
+
+  double note_notation;
+  int tempo;
+  double t;
+  double AT;
+  double DT;
+  double SL;
+  double RT;
 
 private:
   SDL_Window *w;
