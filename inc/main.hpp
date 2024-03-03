@@ -6,6 +6,7 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_video.h>
+#include <map>
 #define BHEIGHT 800
 #define BWIDTH 1600
 #define NOTES 24
@@ -38,6 +39,8 @@ typedef enum {
   R = SDL_SCANCODE_R,
   T = SDL_SCANCODE_T,
   Y = SDL_SCANCODE_Y,
+  LARROW = SDL_SCANCODE_LEFT,
+  RARROW = SDL_SCANCODE_RIGHT,
 } Keys;
 
 void audio_callback(void *userdata, Uint8 *stream, int length);
@@ -49,6 +52,7 @@ public:
 
   typedef double (*wave_fn_ptr)(double, double);
   wave_fn_ptr ptr_arr[6];
+  int wave_ptr_index;
   void do_render();
   int init_audio();
   void define_keymaps();
@@ -56,6 +60,10 @@ public:
   void poll_events();
   void setup_inputs();
   void key_down(int SCANCODE);
+  void synth_key_pressed(int index);
+  void ctrls_key_pressed(int SCANCODE);
+  void synth_key_released(int index);
+  void ctrls_key_released(int SCANCODE);
   void key_up(int SCANCODE);
   int create_window();
   int create_renderer();
@@ -65,9 +73,8 @@ public:
   int render_flag;
   int *playing;
   double *frequency;
-  int *KM;
   Sint16 BUFFER_DATA[BUFFERSIZE];
-
+  std::map<int, std::pair<int, int>> *KM;
   double note_notation;
   int tempo;
   double t;
@@ -77,6 +84,8 @@ public:
   double RT;
 
 private:
+  void previous_wave_fn();
+  void next_wave_fn();
   SDL_Window *w;
   SDL_Renderer *r;
   SDL_AudioSpec spec;

@@ -44,7 +44,7 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
           envelope = (note_duration - NT) / SC->RT;
         }
 
-        double wave = SC->ptr_arr[2](freq, time);
+        double wave = SC->ptr_arr[SC->wave_ptr_index](freq, time);
         double package = distort(wave, 0.75);
         note_samples[note] = package * envelope;
         notes_playing += 1;

@@ -2,8 +2,11 @@
 #include "inc/operations.hpp"
 #include <SDL2/SDL_audio.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_video.h>
+#include <map>
+#include <utility>
 
 Synth::Synth() {
   this->define_keymaps();
@@ -14,7 +17,7 @@ Synth::Synth() {
   this->running = 0;
   this->startup_flag = 0;
   this->render_flag = 0;
-
+  this->wave_ptr_index = 0;
   int err;
 
   this->w = NULL;
@@ -55,7 +58,7 @@ Synth::~Synth() {
   SDL_CloseAudio();
   delete[] this->frequency;
   delete[] this->playing;
-  delete[] this->KM;
+  delete this->KM;
 }
 
 void Synth::create_default_settings() {
@@ -99,16 +102,24 @@ void Synth::setup_inputs() {
   for (int i = 0; i < NOTES; i++) {
     this->playing[i] = 0;
   }
-  quicksortf(this->frequency, 0, NOTES - 1);
-  quicksort(this->playing, 0, NOTES - 1);
 }
 
 void Synth::define_keymaps() {
-  int KEYMAPS[] = {Q, W, E, A, S, D, J, K, L, U, I, O,
-                   Z, X, C, B, N, M, F, G, H, R, T, Y};
-  this->KM = new int[NOTES];
-  memcpy(this->KM, KEYMAPS, sizeof(int) * NOTES);
-  quicksort(this->KM, 0, NOTES - 1);
+  int SYNTH_KEYMAPS[] = {Q, W, E, A, S, D, J, K, L, U, I, O,
+                         Z, X, C, B, N, M, F, G, H, R, T, Y};
+
+  int CONTROLS_KEYMAPS[] = {LARROW, RARROW};
+  this->KM = new std::map<int, std::pair<int, int>>;
+  for (int i = 0; i < NOTES; i++) {
+    std::pair<int, int> index_and_call = std::make_pair(i, 1);
+    this->KM->emplace(std::make_pair(SYNTH_KEYMAPS[i], index_and_call));
+  }
+
+  int LEN = sizeof(CONTROLS_KEYMAPS) / sizeof(CONTROLS_KEYMAPS[0]);
+  for (int c = 0; c < LEN; c++) {
+    std::pair<int, int> index_and_call = std::make_pair(c, 2);
+    this->KM->emplace(std::make_pair(CONTROLS_KEYMAPS[c], index_and_call));
+  }
 }
 
 int Synth::create_window() {
