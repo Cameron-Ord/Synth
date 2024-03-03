@@ -1,3 +1,4 @@
+#include "synths.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 #include <SDL2/SDL_error.h>
@@ -5,7 +6,6 @@
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_video.h>
-
 #define BHEIGHT 800
 #define BWIDTH 1600
 #define NOTES 24
@@ -46,6 +46,9 @@ class Synth {
 public:
   Synth();
   ~Synth();
+
+  typedef double (*wave_fn_ptr)(double, double);
+  wave_fn_ptr ptr_arr[6];
   void do_render();
   int init_audio();
   void define_keymaps();
@@ -58,6 +61,7 @@ public:
   int create_renderer();
   void set_default_buffer();
   void create_default_settings();
+  void create_synth_ptrs();
   int render_flag;
   int *playing;
   double *frequency;

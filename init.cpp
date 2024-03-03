@@ -10,6 +10,7 @@ Synth::Synth() {
   this->setup_inputs();
   this->set_default_buffer();
   this->create_default_settings();
+  this->create_synth_ptrs();
   this->running = 0;
   this->startup_flag = 0;
   this->render_flag = 0;
@@ -66,6 +67,15 @@ void Synth::create_default_settings() {
   this->t = 1.0 / SAMPLERATE;
   this->note_notation = 0.5;
   this->tempo = 120;
+}
+
+void Synth::create_synth_ptrs() {
+  this->ptr_arr[0] = &sawtooth;
+  this->ptr_arr[1] = &sine;
+  this->ptr_arr[2] = &triangle;
+  this->ptr_arr[3] = &square;
+  this->ptr_arr[4] = &tanh_wave;
+  this->ptr_arr[5] = &cosine;
 }
 
 void Synth::set_default_buffer() {
