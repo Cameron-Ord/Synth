@@ -2,19 +2,26 @@
 #include "inc/operations.hpp"
 #include <SDL2/SDL_audio.h>
 #include <SDL2/SDL_render.h>
+#include <SDL2/SDL_stdinc.h>
 #include <SDL2/SDL_video.h>
 
 Synth::Synth() {
   this->define_keymaps();
   this->setup_inputs();
+  this->set_default_buffer();
+
   this->running = 0;
   this->startup_flag = 0;
+  this->render_flag = 0;
+
   int err;
+
   this->w = NULL;
   err = this->create_window();
   if (err < 0) {
     startup_flag = -1;
   }
+
   this->r = NULL;
   err = this->create_renderer();
   if (err < 0) {
@@ -25,10 +32,12 @@ Synth::Synth() {
   if (err < 0) {
     startup_flag = -1;
   }
+
   if (this->startup_flag == 0) {
     SDL_PauseAudioDevice(this->device, 0);
     SDL_PauseAudio(0);
     this->running = 1;
+    this->render_flag = 1;
   }
 }
 
@@ -46,6 +55,10 @@ Synth::~Synth() {
   delete[] this->frequency;
   delete[] this->playing;
   delete[] this->KM;
+}
+
+void Synth::set_default_buffer() {
+  memset(this->BUFFER_DATA, 0, sizeof(Sint16) * BUFFERSIZE);
 }
 
 void Synth::setup_inputs() {
@@ -79,11 +92,13 @@ void Synth::define_keymaps() {
 
 int Synth::create_window() {
   this->w = SDL_CreateWindow("Synth", SDL_WINDOWPOS_CENTERED,
-                             SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
+                             SDL_WINDOWPOS_CENTERED, BWIDTH, BHEIGHT, 0);
   if (!this->w) {
     SDL_Log("Failed to create window! %s", SDL_GetError());
     return -1;
   }
+
+  SDL_SetWindowResizable(this->w, SDL_FALSE);
   return 0;
 }
 

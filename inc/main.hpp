@@ -6,15 +6,13 @@
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_video.h>
 
-#include <cstdlib>
-#include <cstring>
-
-#define HEIGHT 600
-#define WIDTH 800
+#define BHEIGHT 800
+#define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 44100
-#define BUFFERSIZE 64
+#define BUFFERSIZE 1024
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
+
 typedef enum {
   Q = SDL_SCANCODE_Q,
   W = SDL_SCANCODE_W,
@@ -48,7 +46,7 @@ class Synth {
 public:
   Synth();
   ~Synth();
-
+  void do_render();
   int init_audio();
   void define_keymaps();
   void run_main_loop();
@@ -58,9 +56,12 @@ public:
   void key_up(int SCANCODE);
   int create_window();
   int create_renderer();
+  void set_default_buffer();
+  int render_flag;
   int *playing;
   double *frequency;
   int *KM;
+  Sint16 BUFFER_DATA[BUFFERSIZE];
 
 private:
   SDL_Window *w;

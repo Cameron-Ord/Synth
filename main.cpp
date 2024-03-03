@@ -25,5 +25,7 @@ int main() {
 void Synth::run_main_loop() {
   while (this->running == 1) {
     this->poll_events();
+    this->do_render();
+    SDL_Delay(16);
   }
 }
