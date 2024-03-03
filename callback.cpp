@@ -4,10 +4,10 @@
 #include <cstdint>
 #include <math.h>
 
-const double AT = 0.1;
-const double DT = 0.1;
-const double SL = 0.5;
-const double RT = 0.1;
+const double AT = 0.15;
+const double DT = 0.3;
+const double SL = 0.8;
+const double RT = 0.3;
 
 double distort(double in, double amount) { return tanh(in * amount); }
 
