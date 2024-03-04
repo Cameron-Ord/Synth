@@ -62,10 +62,10 @@ Synth::~Synth() {
 }
 
 void Synth::create_default_settings() {
-  this->AT = 0.15;
-  this->DT = 0.3;
-  this->SL = 0.8;
-  this->RT = 0.3;
+  this->AT = 0.1;
+  this->DT = 0.2;
+  this->SL = 0.5;
+  this->RT = 0.2;
 
   this->t = 1.0 / SAMPLERATE;
   this->note_notation = 0.5;

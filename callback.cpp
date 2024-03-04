@@ -6,9 +6,9 @@
 
 void audio_callback(void *userdata, Uint8 *stream, int length) {
   Synth *SC = (Synth *)userdata;
-  Sint16 *stream_ptr = reinterpret_cast<Sint16 *>(stream);
+  Sint16 *streamptr = reinterpret_cast<Sint16 *>(stream);
+  memset(streamptr, 0, sizeof(Sint16)*BUFFERSIZE);
   Sint16 intermediary_buffer[BUFFERSIZE];
-
   static double time = 0.0;
   static double note_timer = 0.0;
   double note_samples[NOTES];
@@ -45,7 +45,7 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
         }
 
         double wave = SC->ptr_arr[SC->wave_ptr_index](freq, time);
-        double package = distort(wave, 0.75);
+        double package = wave;
         note_samples[note] = package * envelope;
         notes_playing += 1;
         sum += note_samples[note];
@@ -70,25 +70,28 @@ void audio_callback(void *userdata, Uint8 *stream, int length) {
       double scaled_sample = sample * INT16_MAX;
       Sint16 casted_sample = static_cast<Sint16>(scaled_sample);
       intermediary_buffer[i] = casted_sample;
+ 
       if (intermediary_buffer[i] > INT16_MAX) {
         intermediary_buffer[i] = INT16_MAX;
       } else if (intermediary_buffer[i] < INT16_MIN) {
         intermediary_buffer[i] = INT16_MIN;
       }
-      stream_ptr[i] = intermediary_buffer[i];
+
     } else {
-      stream_ptr[i] = 0;
+      intermediary_buffer[i] = 0;
     }
+
 
     time += SC->t;
     if (time >= note_timer + note_duration) {
       note_timer += note_duration;
     }
 
-    if (time >= total_duration) {
+    if (time >= (total_duration * 4)) {
       time = 0.0;
       note_timer = 0.0;
     }
   }
-  memcpy(SC->BUFFER_DATA, stream_ptr, sizeof(Sint16) * BUFFERSIZE);
+  memcpy(stream, intermediary_buffer, sizeof(Sint16)*BUFFERSIZE);
+  memcpy(SC->BUFFER_DATA, intermediary_buffer, sizeof(Sint16) * BUFFERSIZE);
 }

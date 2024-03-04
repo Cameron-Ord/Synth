@@ -11,7 +11,7 @@
 #define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 44100
-#define BUFFERSIZE 1024
+#define BUFFERSIZE 512
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
 
 typedef enum {
