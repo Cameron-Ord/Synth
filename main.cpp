@@ -15,7 +15,6 @@ int main() {
   }
 
   Synth *synth = new Synth;
-  synth->run_main_loop();
 
   delete synth;
   SDL_Quit();

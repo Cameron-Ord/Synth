@@ -42,6 +42,7 @@ Synth::Synth() {
     SDL_PauseAudio(0);
     this->running = 1;
     this->render_flag = 1;
+    this->run_main_loop();
   }
 }
 

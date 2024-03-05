@@ -50,14 +50,29 @@ public:
   Synth();
   ~Synth();
 
+  double AT;
+  double DT;
+  double SL;
+  double RT;
+  double t;
+  double note_notation;
+  int tempo;
+
   typedef double (*wave_fn_ptr)(double, double);
   wave_fn_ptr ptr_arr[6];
   int wave_ptr_index;
+  int render_flag;
+  int *playing;
+  double *frequency;
+  Sint16 BUFFER_DATA[BUFFERSIZE];
+  std::map<int, std::pair<int, int>> *KM;
+
+private:
   void do_render();
-  int init_audio();
-  void define_keymaps();
   void run_main_loop();
   void poll_events();
+  int init_audio();
+  void define_keymaps();
   void setup_inputs();
   void key_down(int SCANCODE);
   void synth_key_pressed(int index);
@@ -65,25 +80,11 @@ public:
   void synth_key_released(int index);
   void ctrls_key_released(int SCANCODE);
   void key_up(int SCANCODE);
-  int create_window();
-  int create_renderer();
   void set_default_buffer();
   void create_default_settings();
   void create_synth_ptrs();
-  int render_flag;
-  int *playing;
-  double *frequency;
-  Sint16 BUFFER_DATA[BUFFERSIZE];
-  std::map<int, std::pair<int, int>> *KM;
-  double note_notation;
-  int tempo;
-  double t;
-  double AT;
-  double DT;
-  double SL;
-  double RT;
-
-private:
+  int create_window();
+  int create_renderer();
   void previous_wave_fn();
   void next_wave_fn();
   SDL_Window *w;
