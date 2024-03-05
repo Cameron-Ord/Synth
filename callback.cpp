@@ -1,14 +1,12 @@
 #include "inc/main.hpp"
-#include <SDL2/SDL_stdinc.h>
-#include <cmath>
-#include <cstdint>
-#include <math.h>
 
-double low_pass(double input, double alpha, double last_sample) {
-  return alpha * input + (1 - alpha) * last_sample;
-}
+// Temporarily commenting this all out while I figure out what im gonna do
 
-void audio_callback(void *userdata, Uint8 *stream, int length) {}
+// double low_pass(double input, double alpha, double last_sample) {
+//  return alpha * input + (1 - alpha) * last_sample;
+//}
+
+// void audio_callback(void *userdata, Uint8 *stream, int length) {}
 
 // int STW = length / sizeof(Sint16);
 // Synth *SC = (Synth *)userdata;

@@ -26,9 +26,9 @@ int main() {
 }
 
 void Synth::run_main_loop(InputMap *inputs, SynthWrapper *synfunc) {
-
   while (this->running == 1) {
     inputs->poll_events(this, synfunc);
+    this->generate_samples(synfunc);
     this->do_render();
     SDL_Delay(16);
   }

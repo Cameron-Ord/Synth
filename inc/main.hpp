@@ -99,6 +99,7 @@ public:
   int create_renderer();
   void setup_frequencies();
   void run_main_loop(InputMap *inputs, SynthWrapper *synfunc);
+  void generate_samples(SynthWrapper *synfunc);
   double AT;
   double DT;
   double SL;
