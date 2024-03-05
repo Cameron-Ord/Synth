@@ -1,23 +1,42 @@
 #include "inc/main.hpp"
-#include "inc/operations.hpp"
-#include <SDL2/SDL_audio.h>
-#include <SDL2/SDL_render.h>
-#include <SDL2/SDL_scancode.h>
-#include <SDL2/SDL_stdinc.h>
-#include <SDL2/SDL_video.h>
-#include <map>
-#include <utility>
 
-Synth::Synth() {
-  this->define_keymaps();
-  this->setup_inputs();
+InputMap::InputMap() { this->define_keymaps(); }
+
+void InputMap::define_keymaps() {
+  int SYNTH_KEYMAPS[] = {Q, W, E, A, S, D, J, K, L, U, I, O,
+                         Z, X, C, B, N, M, F, G, H, R, T, Y};
+
+  int CONTROLS_KEYMAPS[] = {LARROW, RARROW};
+  this->KM = new std::map<int, std::pair<int, int>>;
+  for (int i = 0; i < NOTES; i++) {
+    std::pair<int, int> index_and_call = std::make_pair(i, 1);
+    this->KM->emplace(std::make_pair(SYNTH_KEYMAPS[i], index_and_call));
+  }
+
+  int LEN = sizeof(CONTROLS_KEYMAPS) / sizeof(CONTROLS_KEYMAPS[0]);
+  for (int c = 0; c < LEN; c++) {
+    std::pair<int, int> index_and_call = std::make_pair(c, 2);
+    this->KM->emplace(std::make_pair(CONTROLS_KEYMAPS[c], index_and_call));
+  }
+}
+
+InputMap::~InputMap() { delete this->KM; }
+
+SynthWrapper::SynthWrapper() {
+  this->create_synth_ptrs();
+  this->wave_ptr_index = 0;
+}
+
+SynthWrapper::~SynthWrapper() {}
+
+Synth::Synth(InputMap *inputs, SynthWrapper *synfunc) {
+  this->setup_frequencies();
   this->set_default_buffer();
   this->create_default_settings();
-  this->create_synth_ptrs();
   this->running = 0;
   this->startup_flag = 0;
   this->render_flag = 0;
-  this->wave_ptr_index = 0;
+  this->buffer_flag = 0;
   int err;
 
   this->w = NULL;
@@ -42,7 +61,7 @@ Synth::Synth() {
     SDL_PauseAudio(0);
     this->running = 1;
     this->render_flag = 1;
-    this->run_main_loop();
+    this->run_main_loop(inputs, synfunc);
   }
 }
 
@@ -59,7 +78,6 @@ Synth::~Synth() {
   SDL_CloseAudio();
   delete[] this->frequency;
   delete[] this->playing;
-  delete this->KM;
 }
 
 void Synth::create_default_settings() {
@@ -73,20 +91,11 @@ void Synth::create_default_settings() {
   this->tempo = 90;
 }
 
-void Synth::create_synth_ptrs() {
-  this->ptr_arr[0] = &sawtooth;
-  this->ptr_arr[1] = &sine;
-  this->ptr_arr[2] = &triangle;
-  this->ptr_arr[3] = &square;
-  this->ptr_arr[4] = &tanh_wave;
-  this->ptr_arr[5] = &cosine;
-}
-
 void Synth::set_default_buffer() {
   memset(this->BUFFER_DATA, 0, sizeof(Sint16) * BUFFERSIZE);
 }
 
-void Synth::setup_inputs() {
+void Synth::setup_frequencies() {
   double f[] = {130.81,     138.59,     146.83,     155.56,     164.81,
                 174.61,     185.00,     196.00,     207.65,     220.00,
                 233.08,     246.94,     130.81 * 2, 138.59 * 2, 146.83 * 2,
@@ -102,24 +111,6 @@ void Synth::setup_inputs() {
 
   for (int i = 0; i < NOTES; i++) {
     this->playing[i] = 0;
-  }
-}
-
-void Synth::define_keymaps() {
-  int SYNTH_KEYMAPS[] = {Q, W, E, A, S, D, J, K, L, U, I, O,
-                         Z, X, C, B, N, M, F, G, H, R, T, Y};
-
-  int CONTROLS_KEYMAPS[] = {LARROW, RARROW};
-  this->KM = new std::map<int, std::pair<int, int>>;
-  for (int i = 0; i < NOTES; i++) {
-    std::pair<int, int> index_and_call = std::make_pair(i, 1);
-    this->KM->emplace(std::make_pair(SYNTH_KEYMAPS[i], index_and_call));
-  }
-
-  int LEN = sizeof(CONTROLS_KEYMAPS) / sizeof(CONTROLS_KEYMAPS[0]);
-  for (int c = 0; c < LEN; c++) {
-    std::pair<int, int> index_and_call = std::make_pair(c, 2);
-    this->KM->emplace(std::make_pair(CONTROLS_KEYMAPS[c], index_and_call));
   }
 }
 

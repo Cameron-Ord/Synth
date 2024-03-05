@@ -1,13 +1,12 @@
-#include "inc/operations.hpp"
-#include <cstdio>
+#include "inc/main.hpp"
 
-void swap(int *a, int *b) {
+void DataOps::swap(int *a, int *b) {
   int t = *a;
   *a = *b;
   *b = t;
 }
 
-int partition(int *map, int low, int high) {
+int DataOps::partition(int *map, int low, int high) {
   int pivot = map[high];
   int i = (low - 1);
   for (int j = low; j <= high - 1; j++) {
@@ -20,7 +19,7 @@ int partition(int *map, int low, int high) {
   return (i + 1);
 }
 
-void quicksort(int *map, int low, int high) {
+void DataOps::quicksort(int *map, int low, int high) {
   if (low < high) {
     int pivot = partition(map, low, high);
     quicksort(map, low, pivot - 1);
@@ -28,13 +27,13 @@ void quicksort(int *map, int low, int high) {
   }
 }
 
-void swapf(double *a, double *b) {
+void DataOps::swapf(double *a, double *b) {
   int t = *a;
   *a = *b;
   *b = t;
 }
 
-int partitionf(double *map, int low, int high) {
+int DataOps::partitionf(double *map, int low, int high) {
   int pivot = map[high];
   int i = (low - 1);
   for (int j = low; j <= high - 1; j++) {
@@ -47,7 +46,7 @@ int partitionf(double *map, int low, int high) {
   return (i + 1);
 }
 
-void quicksortf(double *map, int low, int high) {
+void DataOps::quicksortf(double *map, int low, int high) {
   if (low < high) {
     int pivot = partitionf(map, low, high);
     quicksortf(map, low, pivot - 1);
@@ -55,7 +54,7 @@ void quicksortf(double *map, int low, int high) {
   }
 }
 
-int find_key_pressed(int *enumlist, int target) {
+int DataOps::find_key_pressed(int *enumlist, int target) {
   int left = 0;
   int right = 23;
   while (left <= right) {

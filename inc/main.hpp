@@ -1,4 +1,3 @@
-#include "synths.hpp"
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 #include <SDL2/SDL_error.h>
@@ -7,6 +6,7 @@
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_video.h>
 #include <map>
+
 #define BHEIGHT 800
 #define BWIDTH 1600
 #define NOTES 24
@@ -45,11 +45,60 @@ typedef enum {
 
 void audio_callback(void *userdata, Uint8 *stream, int length);
 
+class InputMap;
+class SynthWrapper;
+class ADSR;
+class Synth;
+
+class InputMap {
+public:
+  InputMap();
+  ~InputMap();
+  void synth_key_pressed(int index, int playing[]);
+  void ctrls_key_pressed(int SCANCODE, int *wave_ptr_index);
+  void ctrls_key_released(int SCANCODE);
+  void key_up(int SCANCODE, int playing[]);
+  void define_keymaps();
+  void setup_inputs();
+  void synth_key_released(int index, int playing[]);
+  void key_down(int SCANCODE, int playing[], int *wave_ptr_index);
+  void previous_wave_fn(int *wave_ptr_index);
+  void next_wave_fn(int *wave_ptr_index);
+  void poll_events(Synth *syn, SynthWrapper *synfunc);
+  std::map<int, std::pair<int, int>> *KM;
+
+private:
+};
+
+class SynthWrapper {
+public:
+  SynthWrapper();
+  ~SynthWrapper();
+  typedef double (SynthWrapper::*wave_fn_ptr)(double, double);
+  wave_fn_ptr ptr_arr[6];
+  int wave_ptr_index;
+  double distort(double in, double amount);
+  double sawtooth(double freq, double time);
+  double tanh_wave(double freq, double time);
+  double sine(double freq, double time);
+  double cosine(double freq, double time);
+  double square(double freq, double time);
+  double triangle(double freq, double time);
+  void create_synth_ptrs();
+};
+
 class Synth {
 public:
-  Synth();
+  Synth(InputMap *inputs, SynthWrapper *synfunc);
   ~Synth();
-
+  void do_render();
+  int init_audio();
+  void set_default_buffer();
+  void create_default_settings();
+  int create_window();
+  int create_renderer();
+  void setup_frequencies();
+  void run_main_loop(InputMap *inputs, SynthWrapper *synfunc);
   double AT;
   double DT;
   double SL;
@@ -57,40 +106,33 @@ public:
   double t;
   double note_notation;
   int tempo;
-
-  typedef double (*wave_fn_ptr)(double, double);
-  wave_fn_ptr ptr_arr[6];
-  int wave_ptr_index;
+  int buffer_flag;
   int render_flag;
   int *playing;
   double *frequency;
   Sint16 BUFFER_DATA[BUFFERSIZE];
-  std::map<int, std::pair<int, int>> *KM;
+  int running;
 
 private:
-  void do_render();
-  void run_main_loop();
-  void poll_events();
-  int init_audio();
-  void define_keymaps();
-  void setup_inputs();
-  void key_down(int SCANCODE);
-  void synth_key_pressed(int index);
-  void ctrls_key_pressed(int SCANCODE);
-  void synth_key_released(int index);
-  void ctrls_key_released(int SCANCODE);
-  void key_up(int SCANCODE);
-  void set_default_buffer();
-  void create_default_settings();
-  void create_synth_ptrs();
-  int create_window();
-  int create_renderer();
-  void previous_wave_fn();
-  void next_wave_fn();
   SDL_Window *w;
   SDL_Renderer *r;
   SDL_AudioSpec spec;
   SDL_AudioDeviceID device;
-  int running;
   int startup_flag;
+};
+
+class DataOps {
+public:
+  void swapf(double *a, double *b);
+  int partitionf(double *map, int low, int high);
+  void quicksortf(double *map, int low, int high);
+  void swap(int *a, int *b);
+  int partition(int *map, int low, int high);
+  void quicksort(int *map, int low, int high);
+  int find_key_pressed(int *enumlist, int target);
+};
+
+class ADSRGen {
+public:
+private:
 };

@@ -1,5 +1,4 @@
 #include "inc/main.hpp"
-
 int init_sdl() {
   if (SDL_Init(SDL_INIT_EVERYTHING) < 0) {
     SDL_Log("Unable to init SDL2 %s", SDL_GetError());
@@ -14,16 +13,22 @@ int main() {
     return 1;
   }
 
-  Synth *synth = new Synth;
+  InputMap *inputs = new InputMap;
+  SynthWrapper *synth_functions = new SynthWrapper;
+  Synth *synth = new Synth(inputs, synth_functions);
 
+  delete inputs;
+  delete synth_functions;
   delete synth;
+
   SDL_Quit();
   return 0;
 }
 
-void Synth::run_main_loop() {
+void Synth::run_main_loop(InputMap *inputs, SynthWrapper *synfunc) {
+
   while (this->running == 1) {
-    this->poll_events();
+    inputs->poll_events(this, synfunc);
     this->do_render();
     SDL_Delay(16);
   }
