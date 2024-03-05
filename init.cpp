@@ -62,14 +62,14 @@ Synth::~Synth() {
 }
 
 void Synth::create_default_settings() {
-  this->AT = 0.1;
-  this->DT = 0.2;
-  this->SL = 0.5;
-  this->RT = 0.2;
+  this->AT = 0.8;
+  this->DT = 0.3;
+  this->SL = 0.8;
+  this->RT = 0.4;
 
   this->t = 1.0 / SAMPLERATE;
   this->note_notation = 0.5;
-  this->tempo = 120;
+  this->tempo = 90;
 }
 
 void Synth::create_synth_ptrs() {
