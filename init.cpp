@@ -78,15 +78,15 @@ Synth::~Synth() {
   SDL_CloseAudio();
   delete[] this->frequency;
   delete[] this->playing;
+  delete[] this->times;
+  delete[] this->time_periods;
 }
 
 void Synth::create_default_settings() {
-  this->AT = 0.8;
-  this->DT = 0.3;
+  this->AT = 0.4;
+  this->DT = 0.2;
   this->SL = 0.8;
-  this->RT = 0.4;
-
-  this->t = 1.0 / SAMPLERATE;
+  this->RT = 0.2;
   this->note_notation = 0.5;
   this->tempo = 90;
 }
@@ -104,13 +104,14 @@ void Synth::setup_frequencies() {
 
   this->frequency = new double[NOTES];
   this->playing = new int[NOTES];
+  this->time_periods = new double[NOTES];
+  this->times = new double[NOTES];
 
   for (int k = 0; k < NOTES; k++) {
     this->frequency[k] = f[k];
-  }
-
-  for (int i = 0; i < NOTES; i++) {
-    this->playing[i] = 0;
+    this->time_periods[k] = (1.0 / f[k]);
+    this->times[k] = 0.0;   
+    this->playing[k] = 0;
   }
 }
 
@@ -142,7 +143,7 @@ int Synth::init_audio() {
   this->spec.format = AUDIO_S16;
   this->spec.channels = 1;
   this->spec.samples = BUFFERSIZE;
-  this->spec.callback = nullptr;
+  this->spec.callback = audio_callback;
   this->spec.userdata = this;
   this->device = SDL_OpenAudioDevice(NULL, 0, &this->spec, NULL, 0);
   if (!this->device) {

@@ -6,7 +6,13 @@
 //  return alpha * input + (1 - alpha) * last_sample;
 //}
 
-// void audio_callback(void *userdata, Uint8 *stream, int length) {}
+void audio_callback(void *userdata, Uint8 *stream, int length) {
+	Synth *s = (Synth *)userdata;
+	if(s->buffer_flag == 1){
+		memcpy(stream, s->BUFFER_DATA, sizeof(Sint16)* (length / sizeof(Sint16)));
+	}
+	s->buffer_flag = 0;
+}
 
 // int STW = length / sizeof(Sint16);
 // Synth *SC = (Synth *)userdata;

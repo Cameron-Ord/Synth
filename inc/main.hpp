@@ -11,7 +11,7 @@
 #define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 48000
-#define BUFFERSIZE 1024
+#define BUFFERSIZE 2048
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
 
 typedef enum {
@@ -100,11 +100,16 @@ public:
   void setup_frequencies();
   void run_main_loop(InputMap *inputs, SynthWrapper *synfunc);
   void generate_samples(SynthWrapper *synfunc);
+  void check_play_state(int *playing_flag);
+  void create_sample_radians(SynthWrapper *synfunc, double *sam, double *ssum, double *ls);
+  double generate_envelope(SynthWrapper *synfunc);
+  double normalize_radians(double ssum, int notes_playing, double *amp, double AMP_MAX);
   double AT;
   double DT;
   double SL;
   double RT;
-  double t;
+  double *times;
+  double *time_periods;
   double note_notation;
   int tempo;
   int buffer_flag;
