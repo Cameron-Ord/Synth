@@ -6,12 +6,13 @@
 #include <SDL2/SDL_scancode.h>
 #include <SDL2/SDL_video.h>
 #include <map>
+#include <set>
 
 #define BHEIGHT 800
 #define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 48000
-#define BUFFERSIZE 2048
+#define BUFFERSIZE 1024
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
 
 typedef enum {
@@ -54,6 +55,7 @@ class InputMap {
 public:
   InputMap();
   ~InputMap();
+  int find_held_key(int SCANCODE);
   void synth_key_pressed(int index, int playing[]);
   void ctrls_key_pressed(int SCANCODE, int *wave_ptr_index);
   void ctrls_key_released(int SCANCODE);
@@ -66,6 +68,7 @@ public:
   void next_wave_fn(int *wave_ptr_index);
   void poll_events(Synth *syn, SynthWrapper *synfunc);
   std::map<int, std::pair<int, int>> *KM;
+  std::set<int> held_keys;
 
 private:
 };
@@ -75,13 +78,12 @@ public:
   SynthWrapper();
   ~SynthWrapper();
   typedef double (SynthWrapper::*wave_fn_ptr)(double, double);
-  wave_fn_ptr ptr_arr[6];
+  wave_fn_ptr ptr_arr[4];
   int wave_ptr_index;
   double distort(double in, double amount);
+  double w(double freq);
   double sawtooth(double freq, double time);
-  double tanh_wave(double freq, double time);
   double sine(double freq, double time);
-  double cosine(double freq, double time);
   double square(double freq, double time);
   double triangle(double freq, double time);
   void create_synth_ptrs();
@@ -101,17 +103,17 @@ public:
   void run_main_loop(InputMap *inputs, SynthWrapper *synfunc);
   void generate_samples(SynthWrapper *synfunc);
   void check_play_state(int *playing_flag);
-  void create_sample_radians(SynthWrapper *synfunc, double *sam, double *ssum, double *ls);
+  void create_sample_radians(SynthWrapper *synfunc, double *sam, double *ssum,
+                             double *ls);
   double generate_envelope(SynthWrapper *synfunc);
-  double normalize_radians(double ssum, int notes_playing, double *amp, double AMP_MAX);
+  double normalize_radians(double ssum, int notes_playing, double *amp,
+                           double AMP_MAX);
   double AT;
   double DT;
   double SL;
   double RT;
   double *times;
   double *time_periods;
-  double note_notation;
-  int tempo;
   int buffer_flag;
   int render_flag;
   int *playing;

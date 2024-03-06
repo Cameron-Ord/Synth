@@ -1,5 +1,6 @@
 #include "inc/main.hpp"
 #include <SDL2/SDL_events.h>
+#include <cinttypes>
 
 void InputMap::synth_key_pressed(int index, int playing[]) {
   playing[index] = 1;
@@ -21,7 +22,7 @@ void InputMap::ctrls_key_pressed(int SCANCODE, int *wave_ptr_index) {
 }
 
 void InputMap::previous_wave_fn(int *wave_ptr_index) {
-  int LEN = 6;
+  int LEN = 4;
   int index_cpy = *wave_ptr_index;
   index_cpy--;
   if (index_cpy < 0) {
@@ -31,7 +32,7 @@ void InputMap::previous_wave_fn(int *wave_ptr_index) {
 }
 
 void InputMap::next_wave_fn(int *wave_ptr_index) {
-  int LEN = 6;
+  int LEN = 4;
   int index_cpy = *wave_ptr_index;
   index_cpy++;
   if (index_cpy > LEN - 1) {
@@ -66,7 +67,11 @@ void InputMap::key_down(int SCANCODE, int playing[], int *wave_ptr_index) {
       this->ctrls_key_pressed(iteration->first, wave_ptr_index);
       break;
     case 1:
-      this->synth_key_pressed(iteration->second.first, playing);
+      int is_held_key = this->find_held_key(SCANCODE);
+      if (!is_held_key) {
+        this->synth_key_pressed(iteration->second.first, playing);
+        this->held_keys.insert(SCANCODE);
+      }
       break;
     }
   }
@@ -78,7 +83,17 @@ void InputMap::key_up(int SCANCODE, int playing[]) {
     switch (iteration->second.second) {
     case 1:
       this->synth_key_released(iteration->second.first, playing);
+      this->held_keys.erase(SCANCODE);
       break;
     }
+  }
+}
+
+int InputMap::find_held_key(int SCANCODE) {
+  auto it = this->held_keys.find(SCANCODE);
+  if (it != this->held_keys.end()) {
+    return 1;
+  } else {
+    return 0;
   }
 }

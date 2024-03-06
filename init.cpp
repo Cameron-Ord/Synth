@@ -87,8 +87,6 @@ void Synth::create_default_settings() {
   this->DT = 0.2;
   this->SL = 0.8;
   this->RT = 0.2;
-  this->note_notation = 0.5;
-  this->tempo = 90;
 }
 
 void Synth::set_default_buffer() {
@@ -110,7 +108,7 @@ void Synth::setup_frequencies() {
   for (int k = 0; k < NOTES; k++) {
     this->frequency[k] = f[k];
     this->time_periods[k] = (1.0 / f[k]);
-    this->times[k] = 0.0;   
+    this->times[k] = 0.0;
     this->playing[k] = 0;
   }
 }
