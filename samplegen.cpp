@@ -8,7 +8,7 @@ void Synth::generate_samples(SynthWrapper *synfunc) {
       double last_sample = 0.0;
       this->create_sample_radians(synfunc, &sample, &ssum, &last_sample);
       double scaled_sample = sample * INT16_MAX;
-      this->BUFFER_DATA[i] = static_cast<Sint16>(scaled_sample);
+      this->BUFFER_DATA[i] = static_cast<Sint16>(round(scaled_sample * 0.75));
     }
     this->buffer_flag = 1;
   }
