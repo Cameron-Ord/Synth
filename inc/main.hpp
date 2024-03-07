@@ -103,12 +103,13 @@ public:
   void run_main_loop(InputMap *inputs, SynthWrapper *synfunc);
   void generate_samples(SynthWrapper *synfunc);
   void check_play_state(int *playing_flag);
-  void create_sample_radians(SynthWrapper *synfunc, double *sam, double *ssum,
-                             double *ls);
+  void create_sample_radians(SynthWrapper *synfunc, double *sam, double *ssum);
   double generate_envelope(SynthWrapper *synfunc);
   double get_max_value(double absmax, double sample);
   double normalize_sample(double sample_sum, double absmax);
-
+  double handle_release(int n);
+  double create_envelope(SynthWrapper *synfunc, int n, double package);
+  double generate_wave(SynthWrapper *synfunc, int n, double t);
   double tempo;
   double *times;
   double *time_periods;
