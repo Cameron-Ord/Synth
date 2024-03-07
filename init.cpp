@@ -6,7 +6,7 @@ void InputMap::define_keymaps() {
   int SYNTH_KEYMAPS[] = {Q, W, E, A, S, D, J, K, L, U, I, O,
                          Z, X, C, B, N, M, F, G, H, R, T, Y};
 
-  int CONTROLS_KEYMAPS[] = {LARROW, RARROW};
+  int CONTROLS_KEYMAPS[] = {LARROW, RARROW, UARROW, DARROW};
   this->KM = new std::map<int, std::pair<int, int>>;
   for (int i = 0; i < NOTES; i++) {
     std::pair<int, int> index_and_call = std::make_pair(i, 1);

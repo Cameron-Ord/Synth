@@ -42,6 +42,8 @@ typedef enum {
   Y = SDL_SCANCODE_Y,
   LARROW = SDL_SCANCODE_LEFT,
   RARROW = SDL_SCANCODE_RIGHT,
+  UARROW = SDL_SCANCODE_UP,
+  DARROW = SDL_SCANCODE_DOWN,
 } Keys;
 
 void audio_callback(void *userdata, Uint8 *stream, int length);
@@ -56,15 +58,17 @@ class InputMap {
 public:
   InputMap();
   ~InputMap();
+  void up_octave(double frequency[]);
+  void down_octave(double frequency[]);
   int find_held_key(int SCANCODE);
   void synth_key_pressed(int index, int playing[]);
-  void ctrls_key_pressed(int SCANCODE, int *wave_ptr_index);
+  void ctrls_key_pressed(int SCANCODE, int *wave_ptr_index, double frequency[]);
   void ctrls_key_released(int SCANCODE);
   void key_up(int SCANCODE, int playing[]);
   void define_keymaps();
   void setup_inputs();
   void synth_key_released(int index, int playing[]);
-  void key_down(int SCANCODE, int playing[], int *wave_ptr_index);
+  void key_down(int SCANCODE, int playing[], int *wave_ptr_index, double frequency[]);
   void previous_wave_fn(int *wave_ptr_index);
   void next_wave_fn(int *wave_ptr_index);
   void poll_events(Synth *syn, SynthWrapper *synfunc);
@@ -78,7 +82,7 @@ class SynthWrapper {
 public:
   SynthWrapper();
   ~SynthWrapper();
-  wave_fn_ptr ptr_arr[4];
+  wave_fn_ptr ptr_arr[2];
   int wave_ptr_index;
   double distort(double in, double amount);
   double w(double freq);

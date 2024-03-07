@@ -22,9 +22,7 @@ void Synth::generate_samples(SynthWrapper *synfunc) {
         double normalized_sample = this->normalize_sample(samples[d], absmax);
         samples[d] = normalized_sample;
       }
-
-      samples[d] *= INT16_MAX * 0.6;
-
+      samples[d] *= INT16_MAX;
       this->BUFFER_DATA[d] = static_cast<Sint16>(samples[d]);
     }
     this->buffer_flag = 1;
@@ -45,7 +43,7 @@ void Synth::create_sample_radians(SynthWrapper *synfunc, double *sam,
       *ssum += note_samples[note]; 
     } else if (!this->playing[note] && this->times[note] > 0.0) {
       note_samples[note] *= this->handle_release(note);
-      *ssum += note_samples[note] ;
+      *ssum += note_samples[note];
       if (note_samples[note] <= 0.0000005) {
         this->times[note] = 0.0;
       }
@@ -64,7 +62,7 @@ double Synth::handle_release(int n){
 
 double Synth::create_envelope(SynthWrapper *synfunc, int n, double package){
       adsr.handle_envelope_generation(n, this->times[n]);
-      double sample = synfunc->distort(package, 0.8) * adsr.envelope[n];
+      double sample = package * adsr.envelope[n];
       return sample;
 }
 

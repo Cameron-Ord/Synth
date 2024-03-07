@@ -10,7 +10,19 @@ void InputMap::synth_key_released(int index, int playing[]) {
   playing[index] = 0;
 }
 
-void InputMap::ctrls_key_pressed(int SCANCODE, int *wave_ptr_index) {
+void InputMap::up_octave(double frequency[]){
+	for(int i = 0; i < NOTES; i++){
+		frequency[i] *= 2;
+	}
+}
+
+void InputMap::down_octave(double frequency[]){
+	for(int i = 0; i < NOTES; i++){
+		frequency[i] /= 2;
+	}
+}
+
+void InputMap::ctrls_key_pressed(int SCANCODE, int *wave_ptr_index, double frequency[]) {
   switch (SCANCODE) {
   case LARROW:
     this->previous_wave_fn(wave_ptr_index);
@@ -18,11 +30,17 @@ void InputMap::ctrls_key_pressed(int SCANCODE, int *wave_ptr_index) {
   case RARROW:
     this->next_wave_fn(wave_ptr_index);
     break;
+  case UARROW:
+    this->up_octave(frequency);
+    break;
+  case DARROW:
+    this->down_octave(frequency);
+    break;
   }
 }
 
 void InputMap::previous_wave_fn(int *wave_ptr_index) {
-  int LEN = 4;
+  int LEN = 2;
   int index_cpy = *wave_ptr_index;
   index_cpy--;
   if (index_cpy < 0) {
@@ -32,7 +50,7 @@ void InputMap::previous_wave_fn(int *wave_ptr_index) {
 }
 
 void InputMap::next_wave_fn(int *wave_ptr_index) {
-  int LEN = 4;
+  int LEN = 2;
   int index_cpy = *wave_ptr_index;
   index_cpy++;
   if (index_cpy > LEN - 1) {
@@ -47,7 +65,7 @@ void InputMap::poll_events(Synth *syn, SynthWrapper *synfunc) {
     switch (e.type) {
     case SDL_KEYDOWN:
       this->key_down(e.key.keysym.scancode, syn->playing,
-                     &synfunc->wave_ptr_index);
+                     &synfunc->wave_ptr_index, syn->frequency);
       break;
     case SDL_KEYUP:
       this->key_up(e.key.keysym.scancode, syn->playing);
@@ -59,12 +77,12 @@ void InputMap::poll_events(Synth *syn, SynthWrapper *synfunc) {
   }
 }
 
-void InputMap::key_down(int SCANCODE, int playing[], int *wave_ptr_index) {
+void InputMap::key_down(int SCANCODE, int playing[], int *wave_ptr_index, double frequency[]) {
   auto iteration = this->KM->find(SCANCODE);
   if (iteration != this->KM->end()) {
     switch (iteration->second.second) {
     case 2:
-      this->ctrls_key_pressed(iteration->first, wave_ptr_index);
+      this->ctrls_key_pressed(iteration->first, wave_ptr_index, frequency);
       break;
     case 1:
       int is_held_key = this->find_held_key(SCANCODE);

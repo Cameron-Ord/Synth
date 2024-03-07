@@ -1,12 +1,10 @@
 #include "inc/main.hpp"
 #include <math.h>
-double SynthWrapper::w(double freq) { return freq * 2.0 * (M_PI * 2); }
+double SynthWrapper::w(double freq) { return 2.0 * freq * M_PI; }
 
 void SynthWrapper::create_synth_ptrs() {
   this->ptr_arr[0] = &SynthWrapper::sawtooth;
-  this->ptr_arr[1] = &SynthWrapper::sine;
-  this->ptr_arr[2] = &SynthWrapper::triangle;
-  this->ptr_arr[3] = &SynthWrapper::square;
+  this->ptr_arr[1] = &SynthWrapper::square;
 }
 
 double SynthWrapper::sawtooth(double freq, double dtime) {
