@@ -48,11 +48,13 @@ void Synth::create_sample_radians(SynthWrapper *synfunc, double *sam,
       double package = wave;
       adsr.handle_envelope_generation(note, this->times[note]);
       note_samples[note] = package * adsr.envelope[note];
+      *ssum += note_samples[note];
       notes_playing += 1;
     } else if (!this->playing[note] && this->times[note] > 0.0) {
       double package = note_samples[note];
       adsr.set_release_env(note);
       note_samples[note] = package * adsr.envelope[note];
+      *ssum += note_samples[note];
       if (note_samples[note] <= 0.0000005) {
         this->times[note] = 0.0;
       }
@@ -60,7 +62,6 @@ void Synth::create_sample_radians(SynthWrapper *synfunc, double *sam,
       this->times[note] = 0.0;
       note_samples[note] = 0.0;
     }
-    *ssum += note_samples[note];
   }
   *sam = *ssum;
 }
