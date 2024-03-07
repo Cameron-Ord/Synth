@@ -1,6 +1,6 @@
 #include "inc/main.hpp"
 #include <math.h>
-double SynthWrapper::w(double freq) { return freq * 2.0 * M_PI; }
+double SynthWrapper::w(double freq) { return freq * 2.0 * (M_PI * 2); }
 
 void SynthWrapper::create_synth_ptrs() {
   this->ptr_arr[0] = &SynthWrapper::sawtooth;

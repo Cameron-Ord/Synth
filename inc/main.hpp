@@ -12,7 +12,7 @@
 #define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 44100
-#define BUFFERSIZE 512
+#define BUFFERSIZE 1024
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
 
 typedef enum {
@@ -106,8 +106,9 @@ public:
   void create_sample_radians(SynthWrapper *synfunc, double *sam, double *ssum,
                              double *ls);
   double generate_envelope(SynthWrapper *synfunc);
-  double normalize_radians(double ssum, int notes_playing, double *amp,
-                           double AMP_MAX);
+  double get_max_value(double absmax, double sample);
+  double normalize_sample(double sample_sum, double absmax);
+
   double tempo;
   double *times;
   double *time_periods;
@@ -139,19 +140,20 @@ public:
 
 class ADSRGen {
 public:
-	ADSRGen();
-	~ADSRGen();
-	void set_attack_env(int n, double time);
-	void set_decay_env(int n, double time);
-	void set_sustain_env(int n);
-	void set_release_env(int n);
-	void set_gate_switch(int n, double time);
-	void handle_envelope_generation(int n, double time);
-  	double AT;
-  	double DT;
-	double SL;
-  	double RT;
-	double envelope[NOTES];
-	int ads_on;
+  ADSRGen();
+  ~ADSRGen();
+  void set_attack_env(int n, double time);
+  void set_decay_env(int n, double time);
+  void set_sustain_env(int n);
+  void set_release_env(int n);
+  void set_gate_switch(int n, double time);
+  void handle_envelope_generation(int n, double time);
+  double AT;
+  double DT;
+  double SL;
+  double RT;
+  double envelope[NOTES];
+  int ads_on;
+
 private:
 };
