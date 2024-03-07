@@ -50,6 +50,7 @@ class InputMap;
 class SynthWrapper;
 class ADSR;
 class Synth;
+typedef double (SynthWrapper::*wave_fn_ptr)(double, double);
 
 class InputMap {
 public:
@@ -77,7 +78,6 @@ class SynthWrapper {
 public:
   SynthWrapper();
   ~SynthWrapper();
-  typedef double (SynthWrapper::*wave_fn_ptr)(double, double);
   wave_fn_ptr ptr_arr[4];
   int wave_ptr_index;
   double distort(double in, double amount);
@@ -108,10 +108,7 @@ public:
   double generate_envelope(SynthWrapper *synfunc);
   double normalize_radians(double ssum, int notes_playing, double *amp,
                            double AMP_MAX);
-  double AT;
-  double DT;
-  double SL;
-  double RT;
+  double tempo;
   double *times;
   double *time_periods;
   int buffer_flag;
@@ -142,5 +139,19 @@ public:
 
 class ADSRGen {
 public:
+	ADSRGen();
+	~ADSRGen();
+	void set_attack_env(int n, double time);
+	void set_decay_env(int n, double time);
+	void set_sustain_env(int n);
+	void set_release_env(int n);
+	void set_gate_switch(int n, double time);
+	void handle_envelope_generation(int n, double time);
+  	double AT;
+  	double DT;
+	double SL;
+  	double RT;
+	double envelope[NOTES];
+	int ads_on;
 private:
 };

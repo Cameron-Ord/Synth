@@ -83,10 +83,7 @@ Synth::~Synth() {
 }
 
 void Synth::create_default_settings() {
-  this->AT = 0.4;
-  this->DT = 0.2;
-  this->SL = 0.8;
-  this->RT = 0.2;
+  this->tempo =  120.0;
 }
 
 void Synth::set_default_buffer() {
@@ -96,9 +93,9 @@ void Synth::set_default_buffer() {
 void Synth::setup_frequencies() {
   double f[] = {130.81,     138.59,     146.83,     155.56,     164.81,
                 174.61,     185.00,     196.00,     207.65,     220.00,
-                233.08,     246.94,     130.81 / 2, 138.59 / 2, 146.83 / 2,
-                155.56 / 2, 164.81 / 2, 174.61 / 2, 185.00 / 2, 196.00 / 2,
-                207.65 / 2, 220.00 / 2, 233.08 / 2, 246.94 / 2};
+                233.08,     246.94,     130.81 * 2, 138.59 * 2, 146.83 * 2,
+                155.56 * 2, 164.81 * 2, 174.61 * 2, 185.00 * 2, 196.00 * 2,
+                207.65 * 2, 220.00 * 2, 233.08 * 2, 246.94 * 2};
 
   this->frequency = new double[NOTES];
   this->playing = new int[NOTES];
