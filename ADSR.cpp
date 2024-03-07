@@ -2,10 +2,10 @@
 
 
 ADSRGen::ADSRGen(){
- 	this->AT = 0.01;
-	this->DT = 0.1;
-	this->SL = 0.6;
-	this->RT = 0.75;	
+ 	this->AT = 0.1;
+	this->DT = 0.3;
+	this->SL = 0.8;
+	this->RT = 0.2;	
 	memset(this->envelope, 0, sizeof(double)*NOTES);
 }
 
