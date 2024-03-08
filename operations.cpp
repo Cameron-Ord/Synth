@@ -84,9 +84,8 @@ double *DataOps::kaiser_window(double beta, int filter_length) {
 double *DataOps::generate_coefficients(int filter_length, double beta) {
   double *coeffs = new double[filter_length];
   double *kwincoeffs = kaiser_window(beta, filter_length);
-  double nyquist = SAMPLERATE / 2.0;
-  double fraction = 0.00001;
-  double cutoff = fraction * nyquist;
+  double cutoff = 0.9;
+
   for (int i = 0; i < filter_length; ++i) {
     if (i == (filter_length - 1) / 2) {
       coeffs[i] = 2 * cutoff;
@@ -114,13 +113,13 @@ double *DataOps::FIRfunc(double buffer[], double coeff[], int filter_length) {
   }
   return filtered_buffer;
 }
-double *DataOps::downsample(double filtered_buffer[], int buffer_length,
+double *DataOps::downsample(double buffer[], int buffer_length,
                             int dfactor) {
 
   int downsampled_length = buffer_length / dfactor;
   double *downsampled_buffer = new double[downsampled_length];
   for (int i = 0; i < downsampled_length; ++i) {
-    downsampled_buffer[i] = filtered_buffer[i * dfactor];
+    downsampled_buffer[i] = buffer[i * dfactor];
   }
   return downsampled_buffer;
 }

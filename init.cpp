@@ -135,7 +135,7 @@ int Synth::init_audio() {
   this->spec.freq = SAMPLERATE;
   this->spec.format = AUDIO_S16;
   this->spec.channels = 1;
-  this->spec.samples = BUFFERSIZE / 2;
+  this->spec.samples = BUFFERSIZE;
   this->spec.callback = audio_callback;
   this->spec.userdata = this;
   this->device = SDL_OpenAudioDevice(NULL, 0, &this->spec, NULL, 0);
