@@ -10,19 +10,20 @@ void InputMap::synth_key_released(int index, int playing[]) {
   playing[index] = 0;
 }
 
-void InputMap::up_octave(double frequency[]){
-	for(int i = 0; i < NOTES; i++){
-		frequency[i] *= 2;
-	}
+void InputMap::up_octave(double frequency[]) {
+  for (int i = 0; i < NOTES; i++) {
+    frequency[i] *= 2;
+  }
 }
 
-void InputMap::down_octave(double frequency[]){
-	for(int i = 0; i < NOTES; i++){
-		frequency[i] /= 2;
-	}
+void InputMap::down_octave(double frequency[]) {
+  for (int i = 0; i < NOTES; i++) {
+    frequency[i] /= 2;
+  }
 }
 
-void InputMap::ctrls_key_pressed(int SCANCODE, int *wave_ptr_index, double frequency[]) {
+void InputMap::ctrls_key_pressed(int SCANCODE, int *wave_ptr_index,
+                                 double frequency[]) {
   switch (SCANCODE) {
   case LARROW:
     this->previous_wave_fn(wave_ptr_index);
@@ -77,7 +78,8 @@ void InputMap::poll_events(Synth *syn, SynthWrapper *synfunc) {
   }
 }
 
-void InputMap::key_down(int SCANCODE, int playing[], int *wave_ptr_index, double frequency[]) {
+void InputMap::key_down(int SCANCODE, int playing[], int *wave_ptr_index,
+                        double frequency[]) {
   auto iteration = this->KM->find(SCANCODE);
   if (iteration != this->KM->end()) {
     switch (iteration->second.second) {

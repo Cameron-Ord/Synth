@@ -7,9 +7,9 @@ void Synth::do_render() {
     SDL_SetRenderDrawColor(this->r, 40, 42, 54, 0);
     SDL_RenderClear(this->r);
     for (int i = 0; i < BUFFERSIZE; i++) {
-      if (this->BUFFER_DATA[i] > 0) {
+      if (static_cast<Sint16>(this->samples[i]) > 0) {
 
-        float t = static_cast<float>(this->BUFFER_DATA[i]) / INT16_MAX;
+        float t = this->samples[i] / INT16_MAX;
         int x_pos = i * cell_width;
         int y_pos = heightf / 2 - heightf / 2 * t;
         int rect_w = ceilf(cell_width);
@@ -21,9 +21,9 @@ void Synth::do_render() {
         SDL_SetRenderDrawColor(this->r, 189, 147, 249, 0);
         SDL_RenderFillRect(this->r, &radian_rect);
 
-      } else if (this->BUFFER_DATA[i] < 0) {
+      } else if (static_cast<Sint16>(this->samples[i]) < 0) {
 
-        float t = static_cast<float>(this->BUFFER_DATA[i]) / INT16_MIN;
+        float t = this->samples[i] / INT16_MIN;
         int x_pos = i * cell_width;
         int y_pos = heightf / 2;
         int rect_w = ceilf(cell_width);

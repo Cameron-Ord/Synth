@@ -72,7 +72,6 @@ int DataOps::find_key_pressed(int *enumlist, int target) {
 
 double *DataOps::kaiser_window(double beta) {
   double *window = new double[BUFFERSIZE];
-
   const double alpha = (BUFFERSIZE - 1) / 2.0;
   for (int n = 0; n < BUFFERSIZE; ++n) {
     window[n] = std::cyl_bessel_i(
@@ -82,38 +81,36 @@ double *DataOps::kaiser_window(double beta) {
   return window;
 }
 
-double *DataOps::lp_filter(double beta, double cutoff) {
-  double *window = kaiser_window(beta);
-  double *fresponse = new double[BUFFERSIZE];
-
-  const double alpha = (BUFFERSIZE - 1) / 2.0;
-  for (int n = 0; n < BUFFERSIZE; ++n) {
-    if (n == alpha) {
-      fresponse[n] = 2 * cutoff;
+double *DataOps::generate_coefficients(int filter_length, double beta) {
+  double *coeffs = new double[filter_length];
+  double *kwincoeffs = kaiser_window(beta);
+  double nyquist = SAMPLERATE / 2.0;
+  double fraction = 0.00005;
+  double cutoff = fraction * nyquist;
+  for (int i = 0; i < filter_length; ++i) {
+    if (i == (filter_length - 1) / 2) {
+      coeffs[i] = 2 * cutoff;
     } else {
-      fresponse[n] = sin(2 * M_PI * cutoff * (n - alpha)) / M_PI * (n - alpha);
+      double t = i - ((double)filter_length - 1) / 2;
+      coeffs[i] = sin(2 * M_PI * cutoff * t) / (M_PI * t);
     }
   }
 
-  for (int nn = 0; nn < BUFFERSIZE; ++nn) {
-    fresponse[nn] *= window[nn];
+  for (int j = 0; j < filter_length; ++j) {
+    coeffs[j] *= kwincoeffs[j];
   }
-
-  delete[] window;
-  return fresponse;
+  delete[] kwincoeffs;
+  return coeffs;
 }
 
-double *DataOps::FIRfunc(double buffer[], double coeff[]) {
+double *DataOps::FIRfunc(double buffer[], double coeff[], int filter_length) {
   double *filtered_buffer = new double[BUFFERSIZE];
   for (int i = 0; i < BUFFERSIZE; ++i) {
     double OUT = 0.0;
-    for (int j = 0; j < BUFFERSIZE; ++j) {
-      if (i - j >= 0) {
-        OUT += coeff[j] * buffer[i - j];
-      }
+    for (int j = 0; j < filter_length; ++j) {
+      OUT += buffer[i + j] * coeff[j];
     }
     filtered_buffer[i] = OUT;
   }
-  delete[] coeff;
   return filtered_buffer;
 }

@@ -12,7 +12,7 @@
 #define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 44100
-#define BUFFERSIZE 2048
+#define BUFFERSIZE 3064
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
 
 typedef enum {
@@ -124,6 +124,7 @@ public:
   double *frequency;
   Sint16 BUFFER_DATA[BUFFERSIZE];
   int running;
+  double samples[BUFFERSIZE];
 
 private:
   SDL_Window *w;
@@ -135,8 +136,8 @@ private:
 
 class DataOps {
 public:
-  double *FIRfunc(double buffer[], double coeff[]);
-  double *lp_filter(double beta, double cutoff);
+  double *generate_coefficients(int filter_length, double beta);
+  double *FIRfunc(double buffer[], double coeff[], int filter_length);
   double *kaiser_window(double beta);
   void swapf(double *a, double *b);
   int partitionf(double *map, int low, int high);
