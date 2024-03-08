@@ -4,7 +4,7 @@
 ADSRGen adsr;
 DataOps ops;
 
-double *coeffs = ops.generate_coefficients(150, 4.5);
+double *coeffs = ops.generate_coefficients(500, 4.5);
 
 void Synth::generate_samples(SynthWrapper *synfunc) {
   double absmax = 0.0;
@@ -25,14 +25,18 @@ void Synth::generate_samples(SynthWrapper *synfunc) {
       }
     }
 
-    double *fbuffer = ops.FIRfunc(samples, coeffs, 150);
-    for (int f = 0; f < BUFFERSIZE; f++) {
-      fbuffer[f] *= INT16_MAX * 0.95;
-      samples[f] *= INT16_MAX * 0.95;
-      this->BUFFER_DATA[f] = static_cast<Sint16>(fbuffer[f]);
+    double *fbuffer = ops.FIRfunc(samples, coeffs, 500);
+    double *dsampled_visual = ops.downsample(samples, BUFFERSIZE, 2);
+    double *dsampled = ops.downsample(fbuffer, BUFFERSIZE, 2);
+    for (int f = 0; f < BUFFERSIZE / 2; f++) {
+      dsampled[f] *= INT16_MAX;
+      samples[f] = dsampled_visual[f] *= INT16_MAX;
+      this->BUFFER_DATA[f] = static_cast<Sint16>(dsampled[f]);
     }
     this->buffer_flag = 1;
     delete[] fbuffer;
+    delete[] dsampled;
+    delete[] dsampled_visual;
   }
 }
 

@@ -12,7 +12,7 @@
 #define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 44100
-#define BUFFERSIZE 3064
+#define BUFFERSIZE 4096
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
 
 typedef enum {
@@ -136,9 +136,10 @@ private:
 
 class DataOps {
 public:
+  double *downsample(double filtered_buffer[], int buffer_length, int dfactor);
   double *generate_coefficients(int filter_length, double beta);
   double *FIRfunc(double buffer[], double coeff[], int filter_length);
-  double *kaiser_window(double beta);
+  double *kaiser_window(double beta, int filter_length);
   void swapf(double *a, double *b);
   int partitionf(double *map, int low, int high);
   void quicksortf(double *map, int low, int high);

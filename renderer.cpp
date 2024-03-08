@@ -1,12 +1,13 @@
 #include "inc/main.hpp"
 
 void Synth::do_render() {
-  float cell_width = static_cast<float>(BWIDTH) / BUFFERSIZE;
+  float cell_width =
+      static_cast<float>(BWIDTH) / (static_cast<float>(BUFFERSIZE) / 2);
   float heightf = static_cast<float>(BHEIGHT);
   if (this->render_flag == 1) {
     SDL_SetRenderDrawColor(this->r, 40, 42, 54, 0);
     SDL_RenderClear(this->r);
-    for (int i = 0; i < BUFFERSIZE; i++) {
+    for (int i = 0; i < BUFFERSIZE / 2; i++) {
       if (static_cast<Sint16>(this->samples[i]) > 0) {
 
         float t = this->samples[i] / INT16_MAX;
