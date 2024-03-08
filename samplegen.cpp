@@ -4,9 +4,10 @@
 ADSRGen adsr;
 DataOps ops;
 
-double *coeffs = ops.generate_coefficients(100, 8.5);
+double *coeffs = ops.generate_coefficients(300, 8.5);
 
 void Synth::generate_samples(SynthWrapper *synfunc) {
+
   if (!this->buffer_flag) {
     for (int i = 0; i < BUFFERSIZE; ++i) {
       double sample = 0.0;
@@ -16,7 +17,7 @@ void Synth::generate_samples(SynthWrapper *synfunc) {
     }
     
     double absmax = 0.0;
-    double *fbuffer = ops.FIRfunc(samples, coeffs, 100);
+    double *fbuffer = ops.FIRfunc(samples, coeffs, 300);
     for(int j = 0; j < BUFFERSIZE; ++j){
       if (fbuffer[j] < 0.0 || fbuffer[j] > 0.0) {
         absmax = this->get_max_value(fbuffer[j], absmax);
@@ -47,8 +48,7 @@ void Synth::generate_samples(SynthWrapper *synfunc) {
 void Synth::create_sample_radians(SynthWrapper *synfunc, double *sam,
                                   double *ssum) {
   double note_samples[NOTES];
-  double t = 60.0 / (SAMPLERATE * this->tempo);
-
+  double t = 1.0 / SAMPLERATE;
   for (int note = 0; note < NOTES; ++note) {
     if (this->playing[note]) {
       double package = this->generate_wave(synfunc, note, t);
@@ -80,9 +80,9 @@ double Synth::create_envelope(SynthWrapper *synfunc, int n, double package) {
 double Synth::generate_wave(SynthWrapper *synfunc, int n, double t) {
   double freq = this->frequency[n];
   double wave = synfunc->call_func(freq, this->times[n]);
-  // double wave = synfunc->modulator(freq, 60, this->times[n]);
   this->times[n] += t;
   return wave;
+  // double wave = synfunc->modulator(freq, 60, this->times[n]);
 }
 
 double Synth::get_max_value(double sample, double max) {

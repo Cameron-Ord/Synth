@@ -141,7 +141,9 @@ public:
   Sint16 BUFFER_DATA[BUFFERSIZE];
   int running;
   double samples[BUFFERSIZE];
-
+  double beat_duration;
+  double note_duration;
+  double bar_time;
 private:
   SDL_Window *w;
   SDL_Renderer *r;

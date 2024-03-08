@@ -84,7 +84,7 @@ double *DataOps::kaiser_window(double beta, int filter_length) {
 double *DataOps::generate_coefficients(int filter_length, double beta) {
   double *coeffs = new double[filter_length];
   double *kwincoeffs = kaiser_window(beta, filter_length);
-  double cutoff = 0.9;
+  double cutoff = 1.0;
 
   for (int i = 0; i < filter_length; ++i) {
     if (i == (filter_length - 1) / 2) {

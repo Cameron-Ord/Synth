@@ -82,7 +82,12 @@ Synth::~Synth() {
   delete[] this->time_periods;
 }
 
-void Synth::create_default_settings() { this->tempo = 120.0; }
+void Synth::create_default_settings() { 	
+  this->tempo = 120.0;
+  this->beat_duration = 60.0 / this->tempo;
+  this->note_duration = beat_duration / 8;
+  printf("TEMPO : %f, BEAT : %f, NOTE : %f\n", tempo, beat_duration, note_duration);
+}
 
 void Synth::set_default_buffer() {
   memset(this->BUFFER_DATA, 0, sizeof(Sint16) * BUFFERSIZE);
