@@ -12,7 +12,7 @@
 #define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 44100
-#define BUFFERSIZE 1024
+#define BUFFERSIZE 2048
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
 
 typedef enum {
@@ -68,7 +68,8 @@ public:
   void define_keymaps();
   void setup_inputs();
   void synth_key_released(int index, int playing[]);
-  void key_down(int SCANCODE, int playing[], int *wave_ptr_index, double frequency[]);
+  void key_down(int SCANCODE, int playing[], int *wave_ptr_index,
+                double frequency[]);
   void previous_wave_fn(int *wave_ptr_index);
   void next_wave_fn(int *wave_ptr_index);
   void poll_events(Synth *syn, SynthWrapper *synfunc);
@@ -134,6 +135,9 @@ private:
 
 class DataOps {
 public:
+  double *FIRfunc(double buffer[], double coeff[]);
+  double *lp_filter(double beta, double cutoff);
+  double *kaiser_window(double beta);
   void swapf(double *a, double *b);
   int partitionf(double *map, int low, int high);
   void quicksortf(double *map, int low, int high);
