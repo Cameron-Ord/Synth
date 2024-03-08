@@ -41,7 +41,7 @@ void InputMap::ctrls_key_pressed(int SCANCODE, int *wave_ptr_index,
 }
 
 void InputMap::previous_wave_fn(int *wave_ptr_index) {
-  int LEN = 2;
+  int LEN = 3;
   int index_cpy = *wave_ptr_index;
   index_cpy--;
   if (index_cpy < 0) {
@@ -51,7 +51,7 @@ void InputMap::previous_wave_fn(int *wave_ptr_index) {
 }
 
 void InputMap::next_wave_fn(int *wave_ptr_index) {
-  int LEN = 2;
+  int LEN = 3;
   int index_cpy = *wave_ptr_index;
   index_cpy++;
   if (index_cpy > LEN - 1) {

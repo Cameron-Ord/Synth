@@ -79,8 +79,8 @@ double Synth::create_envelope(SynthWrapper *synfunc, int n, double package) {
 
 double Synth::generate_wave(SynthWrapper *synfunc, int n, double t) {
   double freq = this->frequency[n];
-  wave_fn_ptr ptr = synfunc->ptr_arr[synfunc->wave_ptr_index];
-  double wave = (synfunc->*ptr)(freq, this->times[n]);
+  double wave = synfunc->call_func(freq, this->times[n]);
+  // double wave = synfunc->modulator(freq, 60, this->times[n]);
   this->times[n] += t;
   return wave;
 }

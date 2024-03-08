@@ -50,9 +50,20 @@ void audio_callback(void *userdata, Uint8 *stream, int length);
 
 class InputMap;
 class SynthWrapper;
-class ADSR;
+class ADSRGen;
 class Synth;
+class FDN;
 typedef double (SynthWrapper::*wave_fn_ptr)(double, double);
+
+
+class FDN {
+	public:
+	FDN();
+	~FDN();
+	private:
+
+};
+
 
 class InputMap {
 public:
@@ -83,7 +94,9 @@ class SynthWrapper {
 public:
   SynthWrapper();
   ~SynthWrapper();
-  wave_fn_ptr ptr_arr[2];
+  wave_fn_ptr ptr_arr[3];
+  double modulator(double freq, double mi, double dtime);
+  double pulse_wave(double freq, double dtime);
   int wave_ptr_index;
   double distort(double in, double amount);
   double w(double freq);
@@ -92,6 +105,9 @@ public:
   double square(double freq, double time);
   double triangle(double freq, double time);
   void create_synth_ptrs();
+  double call_func(double freq, double dtime);
+private:
+  double time_scalar;
 };
 
 class Synth {
