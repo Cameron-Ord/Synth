@@ -12,7 +12,7 @@
 #define BWIDTH 1600
 #define NOTES 24
 #define SAMPLERATE 44100
-#define BUFFERSIZE 2048
+#define BUFFERSIZE 1024
 #define ARR_LEN(x) sizeof(x) / sizeof(x[0])
 
 typedef enum {
@@ -55,15 +55,13 @@ class Synth;
 class FDN;
 typedef double (SynthWrapper::*wave_fn_ptr)(double, double);
 
-
 class FDN {
-	public:
-	FDN();
-	~FDN();
-	private:
+public:
+  FDN();
+  ~FDN();
 
+private:
 };
-
 
 class InputMap {
 public:
@@ -106,6 +104,7 @@ public:
   double triangle(double freq, double time);
   void create_synth_ptrs();
   double call_func(double freq, double dtime);
+
 private:
   double time_scalar;
 };
@@ -144,6 +143,7 @@ public:
   double beat_duration;
   double note_duration;
   double bar_time;
+
 private:
   SDL_Window *w;
   SDL_Renderer *r;

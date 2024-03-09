@@ -4,33 +4,33 @@
 ADSRGen adsr;
 DataOps ops;
 
-double *coeffs = ops.generate_coefficients(300, 8.5);
+double *coeffs = ops.generate_coefficients(BUFFERSIZE / 2, 7.5);
 
 void Synth::generate_samples(SynthWrapper *synfunc) {
 
   if (!this->buffer_flag) {
-    for (int i = 0; i < BUFFERSIZE; ++i) {
+    for (int i = 0; i < BUFFERSIZE; i++) {
       double sample = 0.0;
       double ssum = 0.0;
       this->create_sample_radians(synfunc, &sample, &ssum);
       samples[i] = sample;
     }
-    
+
     double absmax = 0.0;
-    double *fbuffer = ops.FIRfunc(samples, coeffs, 300);
-    for(int j = 0; j < BUFFERSIZE; ++j){
+    double *fbuffer = ops.FIRfunc(samples, coeffs, BUFFERSIZE / 2);
+    for (int j = 0; j < BUFFERSIZE; ++j) {
       if (fbuffer[j] < 0.0 || fbuffer[j] > 0.0) {
         absmax = this->get_max_value(fbuffer[j], absmax);
       }
     }
-   
+
     double normalized_buffer[BUFFERSIZE];
     for (int d = 0; d < BUFFERSIZE; ++d) {
       if (fbuffer[d] < 0.0 || fbuffer[d] > 0.0) {
         double normalized_sample = this->normalize_sample(fbuffer[d], absmax);
         normalized_buffer[d] = normalized_sample;
       } else {
-      	normalized_buffer[d] = 0.0;
+        normalized_buffer[d] = 0.0;
       }
 
       this->samples[d] *= INT16_MAX * 0.6;
@@ -63,7 +63,7 @@ void Synth::create_sample_radians(SynthWrapper *synfunc, double *sam,
       note_samples[note] = 0.0;
     }
   }
-  *sam = synfunc->distort(*ssum, 0.8);
+  *sam = *ssum;
 }
 
 double Synth::handle_release(int n) {
@@ -81,7 +81,7 @@ double Synth::generate_wave(SynthWrapper *synfunc, int n, double t) {
   double freq = this->frequency[n];
   double wave = synfunc->call_func(freq, this->times[n]);
   this->times[n] += t;
-  return wave;
+  return synfunc->distort(wave, 0.75);
   // double wave = synfunc->modulator(freq, 60, this->times[n]);
 }
 
