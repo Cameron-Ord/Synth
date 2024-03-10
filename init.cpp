@@ -73,6 +73,9 @@ void Initializer::create_dev(std::set<int> *err) {
 }
 
 void Initializer::run_synth(Synth *syn) {
+  printf("-------------\n");
+  printf("STARTING SYNTH LOOP..\n");
+  printf("-------------\n");
   Renderer renderer;
   int *running = syn->get_run_state();
   *running = 1;

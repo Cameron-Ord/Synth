@@ -56,6 +56,10 @@ class Synth {
 public:
   Synth();
   ~Synth();
+  double handle_envelope_gen(double time);
+  double set_attack_env(double time);
+  double set_decay_env(double time);
+  double set_sustain_env();
   void set_fir_filter();
   void set_adsr();
   void set_freeverb();
@@ -76,12 +80,19 @@ public:
   int get_enabled_state();
   int *get_run_state();
   double *kaiser_window(double beta, int filter_length);
-  double *generate_coefficients(int filter_length, double beta);
+  double *generate_kcoefficients(int filter_length, double beta);
+  double *hamming_window(int filter_length);
+  double *generate_hcoefficients(int filter_length);
+
   std::pair<double *, int16_t *> get_buffers();
   std::map<std::string, double> get_params();
   int buffer_enabled;
 
 private:
+  double AT;
+  double DT;
+  double SL;
+  double RT;
   double *coeffs;
   stk::Fir filter;
   int filt_len;
@@ -99,7 +110,6 @@ private:
    playing, only for the size of the vector
   */
   std::vector<std::pair<double, double *>> *playing_freqs;
-
   // buffer pair
   std::pair<double *, int16_t *> buffers;
   // mapping params to their names

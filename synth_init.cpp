@@ -22,30 +22,33 @@ Synth::~Synth() {
 }
 
 void Synth::set_fir_filter() {
-  filt_len = 200;
-  coeffs = generate_coefficients(filt_len, 7.5);
+  filt_len = 150;
+  coeffs = generate_hcoefficients(filt_len);
   std::vector<stk::StkFloat> coeff_vector;
   for (int i = 0; i < filt_len; i++) {
     coeff_vector.push_back(static_cast<stk::StkFloat>(coeffs[i]));
   }
+  printf("-----------------------------------------------------------\n");
+  for (size_t j = 0; j < coeff_vector.size() / 4; j++) {
+    printf("COEFF : %6.3f || COEFF : %6.3f || COEFF : %6.3f || COEF : %6.3f\n",
+           coeff_vector[j], coeff_vector[j + 1], coeff_vector[j + 2],
+           coeff_vector[j + 3]);
+  }
+  printf("-----------------------------------------------------------\n");
   filter.setCoefficients(coeff_vector);
   delete[] coeffs;
 }
 
 void Synth::set_adsr() {
-  stk::StkFloat attack = 0.1;
-  stk::StkFloat decay = 0.2;
-  stk::StkFloat sustain = 0.8;
-  stk::StkFloat release = 0.3;
-  adsr.setAttackRate(attack);
-  adsr.setDecayRate(decay);
-  adsr.setSustainLevel(sustain);
-  adsr.setReleaseRate(release);
+  AT = 0.1;
+  DT = 0.2;
+  SL = 0.8;
+  RT = 0.3;
 }
 
 void Synth::set_freeverb() {
-  verb.setEffectMix(0.2);
-  verb.setRoomSize(0.4);
+  verb.setEffectMix(0.6);
+  verb.setRoomSize(0.6);
   verb.setDamping(0.3);
 }
 void Synth::set_frequencies() {
@@ -55,7 +58,6 @@ void Synth::set_frequencies() {
   };
   base_km = {A, S, D, F, W, E, H, J, K, L, U, I};
   notes_len = base_freqs.size();
-
   frequencies = new std::map<int, std::pair<double, double>>;
   for (size_t i = 0; i < notes_len; i++) {
     int KEY = base_km[i];
