@@ -56,6 +56,8 @@ class Synth {
 public:
   Synth();
   ~Synth();
+  void set_fir_filter();
+  void fir_filter();
   double get_max_value(double sample, double max);
   double normalize_sample(double sample, double absmax);
   void create_sample_buffer();
@@ -78,6 +80,7 @@ public:
   int buffer_enabled;
 
 private:
+  stk::Fir filter;
   int running;
   std::vector<int> base_km;
   std::vector<double> base_freqs;

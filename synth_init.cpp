@@ -1,5 +1,6 @@
 #include "inc/main.hpp"
 #include "inc/scancodes.hpp"
+#include <stk/Fir.h>
 
 Synth::Synth() {
   buffer_enabled = 0;
@@ -7,6 +8,7 @@ Synth::Synth() {
   set_frequencies();
   set_params();
   set_buffers();
+  set_fir_filter();
 }
 
 Synth::~Synth() {
@@ -14,6 +16,11 @@ Synth::~Synth() {
   delete[] buffers.second;
   delete playing_freqs;
   delete frequencies;
+}
+
+void Synth::set_fir_filter() {
+  std::vector<stk::StkFloat> coefficients = {0.1, 0.2, 0.3, 0.2, 0.1};
+  filter.setCoefficients(coefficients);
 }
 
 void Synth::set_frequencies() {

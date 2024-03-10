@@ -101,8 +101,10 @@ void Synth::create_sample_buffer() {
     for (int f = 0; f < BL; f++) {
       double sample = buffers.first[f];
       if (sample < 0.0 || sample > 0.0) {
-        buffers.first[f] = normalize_sample(sample, max);
+        double norm_sample = normalize_sample(sample, max);
+        buffers.first[f] = filter.tick(norm_sample);
       }
+
       buffers.first[f] *= INT16_MAX;
       buffers.second[f] = static_cast<int16_t>(buffers.first[f]);
     }
