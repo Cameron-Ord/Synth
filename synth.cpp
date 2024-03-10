@@ -12,6 +12,7 @@ void Synth::synth_key_on(double freq, double *time) {
   */
   std::pair<double, double *> freq_state_pair = std::make_pair(freq, time);
   playing_freqs->push_back(freq_state_pair);
+  adsr.keyOn();
 }
 
 void Synth::synth_key_off(double freq, double *time) {
@@ -22,6 +23,9 @@ void Synth::synth_key_off(double freq, double *time) {
 
   // Once the item has been removed from the vector, time gets reset to 0.0.
   *time = 0.0;
+  if (playing_freqs->size() == 0) {
+    adsr.keyOff();
+  }
 }
 
 /*
@@ -93,20 +97,22 @@ void Synth::create_sample_buffer() {
       buffers.first[i] = sample;
       sample = generate_sample();
       if (sample < 0.0 || sample > 0.0) {
-        max = get_max_value(sample, max);
-        buffers.first[i] = sample;
+        double filtered = filter.tick(sample);
+        max = get_max_value(filtered, max);
+        buffers.first[i] = filtered;
       }
     }
 
     for (int f = 0; f < BL; f++) {
       double sample = buffers.first[f];
       if (sample < 0.0 || sample > 0.0) {
-        double norm_sample = normalize_sample(sample, max);
-        buffers.first[f] = filter.tick(norm_sample);
+        buffers.first[f] = normalize_sample(sample, max);
+        buffers.first[f] *= adsr.tick();
+        buffers.first[f] *= INT16_MAX * 0.5;
+        buffers.second[f] = static_cast<int16_t>(buffers.first[f]);
+      } else {
+        buffers.second[f] = 0;
       }
-
-      buffers.first[f] *= INT16_MAX;
-      buffers.second[f] = static_cast<int16_t>(buffers.first[f]);
     }
     buffer_enabled = 1;
   }
@@ -141,4 +147,34 @@ double Synth::get_max_value(double sample, double max) {
 
 double Synth::normalize_sample(double sample, double absmax) {
   return sample / absmax;
+}
+
+double *Synth::kaiser_window(double beta, int filter_length) {
+  double *window = new double[filter_length];
+  const double alpha = (filter_length - 1) / 2.0;
+  for (int n = 0; n < filter_length; ++n) {
+    window[n] = std::cyl_bessel_i(
+                    0, beta * std::sqrt(1 - std::pow((n - alpha) / alpha, 2))) /
+                std::cyl_bessel_i(0, beta);
+  }
+  return window;
+}
+
+double *Synth::generate_coefficients(int filter_length, double beta) {
+  double *coeffs = new double[filter_length];
+  double *kwincoeffs = kaiser_window(beta, filter_length);
+  double cutoff = 0.85;
+
+  for (int i = 0; i < filter_length; ++i) {
+    if (i == (filter_length - 1) / 2) {
+      coeffs[i] = 2 * cutoff;
+    } else {
+      double t = i - (static_cast<double>(filter_length) - 1) / 2;
+      coeffs[i] = sin(2 * M_PI * cutoff * t) / (M_PI * t);
+    }
+    coeffs[i] *= kwincoeffs[i];
+  }
+
+  delete[] kwincoeffs;
+  return coeffs;
 }

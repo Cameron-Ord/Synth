@@ -17,7 +17,7 @@
 #include <vector>
 
 #define SR 44100
-#define BL 1024
+#define BL 2048
 #define NLEN 12
 #define BHEIGHT 600
 #define BWIDTH 800
@@ -57,7 +57,8 @@ public:
   Synth();
   ~Synth();
   void set_fir_filter();
-  void fir_filter();
+  void set_adsr();
+  void set_freeverb();
   double get_max_value(double sample, double max);
   double normalize_sample(double sample, double absmax);
   void create_sample_buffer();
@@ -74,13 +75,19 @@ public:
   double generate_sample();
   int get_enabled_state();
   int *get_run_state();
-
+  double *kaiser_window(double beta, int filter_length);
+  double *generate_coefficients(int filter_length, double beta);
   std::pair<double *, int16_t *> get_buffers();
   std::map<std::string, double> get_params();
   int buffer_enabled;
 
 private:
+  double *coeffs;
   stk::Fir filter;
+  int filt_len;
+  stk::ADSR adsr;
+  stk::FreeVerb verb;
+  double envelope;
   int running;
   std::vector<int> base_km;
   std::vector<double> base_freqs;

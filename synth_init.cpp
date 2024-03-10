@@ -1,6 +1,7 @@
 #include "inc/main.hpp"
 #include "inc/scancodes.hpp"
 #include <stk/Fir.h>
+#include <stk/Stk.h>
 
 Synth::Synth() {
   buffer_enabled = 0;
@@ -9,6 +10,8 @@ Synth::Synth() {
   set_params();
   set_buffers();
   set_fir_filter();
+  set_adsr();
+  set_freeverb();
 }
 
 Synth::~Synth() {
@@ -19,10 +22,32 @@ Synth::~Synth() {
 }
 
 void Synth::set_fir_filter() {
-  std::vector<stk::StkFloat> coefficients = {0.1, 0.2, 0.3, 0.2, 0.1};
-  filter.setCoefficients(coefficients);
+  filt_len = 200;
+  coeffs = generate_coefficients(filt_len, 7.5);
+  std::vector<stk::StkFloat> coeff_vector;
+  for (int i = 0; i < filt_len; i++) {
+    coeff_vector.push_back(static_cast<stk::StkFloat>(coeffs[i]));
+  }
+  filter.setCoefficients(coeff_vector);
+  delete[] coeffs;
 }
 
+void Synth::set_adsr() {
+  stk::StkFloat attack = 0.1;
+  stk::StkFloat decay = 0.2;
+  stk::StkFloat sustain = 0.8;
+  stk::StkFloat release = 0.3;
+  adsr.setAttackRate(attack);
+  adsr.setDecayRate(decay);
+  adsr.setSustainLevel(sustain);
+  adsr.setReleaseRate(release);
+}
+
+void Synth::set_freeverb() {
+  verb.setEffectMix(0.2);
+  verb.setRoomSize(0.4);
+  verb.setDamping(0.3);
+}
 void Synth::set_frequencies() {
   base_freqs = {
       130.81, 138.59, 146.83, 155.56, 164.81, 174.61,
