@@ -1,9 +1,11 @@
 #include "inc/main.hpp"
 #include "inc/scancodes.hpp"
-#include <functional>
+#include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_scancode.h>
 #include <utility>
 
 Synth::Synth(Initializer *init) {
+  running = 0;
   add_spec_values(init->get_spec());
   set_frequencies();
   set_params();
@@ -23,17 +25,17 @@ void Synth::set_frequencies() {
   };
   base_km = {A, S, D, F, W, E, H, J, K, L, U, I};
   notes_len = base_freqs.size();
-
-  std::set<std::pair<double, int>> freq_km_sets;
-  std::function<void()> note_function =
-      std::bind(&Synth::handle_synth_key, this);
   for (size_t i = 0; i < notes_len; i++) {
-    double note = base_freqs[i];
-    int scancode = base_km[i];
-    frequencies.emplace(std::make_pair(note, 0), std::make_pair(0.0, 0.0));
-    freq_km_sets.insert(std::make_pair(note, scancode));
+    int KEY = base_km[i];
+    double NOTE = base_freqs[i];
+    frequencies.emplace(KEY, std::make_pair(NOTE, 0));
   }
-  KM.emplace(freq_km_sets, note_function);
+  printf("\n\n");
+  for (size_t j = 0; j < notes_len / 2; j++) {
+    printf("KEY : %c -> NOTE : %f | KEY : %c -> NOTE : %f\n",
+           *SDL_GetKeyName(base_km[j]), base_freqs[j],
+           *SDL_GetKeyName(base_km[j + 1]), base_freqs[j + 1]);
+  }
 }
 
 void Synth::set_buffers() {
@@ -43,32 +45,26 @@ void Synth::set_buffers() {
 }
 
 void Synth::set_params() {
-  std::pair<std::string, double> tempo = std::make_pair("tempo", 120.0);
-
-  std::pair<std::string, double> beat_duration =
-      std::make_pair("beat_duration", (60.0 / tempo.second));
-
-  std::pair<std::string, double> note_duration =
-      std::make_pair("note_duration", (beat_duration.second / 8));
-
-  std::pair<std::string, double> time_step =
-      std::make_pair("time_step", 1.0 / SR);
-
-  playback_params.insert(tempo);
-  playback_params.insert(beat_duration);
-  playback_params.insert(note_duration);
-  playback_params.insert(time_step);
-
-  printf("-----------\n");
-  printf("TEMPO : %f, BEAT : %f, NOTE : %f TIME_STEP : %f\n", tempo.second,
-         beat_duration.second, note_duration.second, time_step.second);
-  printf("-----------\n");
+  params.emplace("tempo", 120.0);
+  params.emplace("beat_duration", (60.0 / params["tempo"]));
+  params.emplace("note_duration", (params["beat_duration"] / 8));
+  params.emplace("time_step", (1.0 / SR));
+  printf("---------------------------------------------------------------------"
+         "---------------------\n");
+  printf("TEMPO : %f, BEAT DURATION : %f, NOTE DURATION : %f, TIME STEP : %f\n",
+         params["tempo"], params["beat_duration"], params["note_duration"],
+         params["time_step"]);
+  printf("---------------------------------------------------------------------"
+         "---------------------\n");
 }
 
-void Synth::run_synth(Initializer *init) {}
-
-std::set<std::pair<std::string, double>> Synth::get_params() {
-  return playback_params;
-}
+std::map<std::string, double> Synth::get_params() { return params; }
 
 std::pair<double *, int16_t *> Synth::get_buffers() { return buffers; }
+
+void Synth::run_synth(Initializer *init) {
+  running = 1;
+  while (running) {
+    poll_events();
+  }
+}

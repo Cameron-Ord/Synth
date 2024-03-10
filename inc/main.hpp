@@ -2,8 +2,6 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
 #include <cstdint>
-#include <functional>
-#include <iostream>
 #include <map>
 #include <set>
 #include <stdio.h>
@@ -52,24 +50,33 @@ class Synth {
 public:
   Synth(Initializer *init);
   ~Synth();
+  void poll_events();
+  void keydown(int KEYCODE);
+  void keyup(int KEYCODE);
   void set_frequencies();
   void set_buffers();
   void set_params();
   void run_synth(Initializer *init);
   void add_spec_values(SDL_AudioSpec *spec);
-  void handle_synth_key();
+  void handle_synth_key(double freq, int *playing);
   std::pair<double *, int16_t *> get_buffers();
-  std::set<std::pair<std::string, double>> get_params();
+  std::map<std::string, double> get_params();
+
+private:
+  int running;
   std::vector<int> base_km;
   std::vector<double> base_freqs;
   size_t notes_len;
-
-private:
-  // freq , playing ---- dtime , amp
-  std::map<std::pair<double, int>, std::pair<double, double>> frequencies;
+  // vector that will be added to, or removed from based on inputs. Used for
+  // iteratively generating samples
+  std::vector<std::pair<double, int>> playing_freqs;
+  // buffer pair
   std::pair<double *, int16_t *> buffers;
-  std::set<std::pair<std::string, double>> playback_params;
+  // mapping params to their names
+  std::map<std::string, double> params;
+  // mapping the frequencies to scancodes
+  std::map<int, std::pair<double, int>> frequencies;
+  // set to track held keys.
   std::set<int> held_keys;
-  std::map<std::set<std::pair<double, int>>, std::function<void()>> KM;
 };
 class Renderer {};

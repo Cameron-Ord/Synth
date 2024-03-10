@@ -1,19 +1,20 @@
 #pragma once
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_keycode.h>
 
 typedef enum {
-  A = SDL_SCANCODE_A,
-  S = SDL_SCANCODE_S,
-  D = SDL_SCANCODE_D,
-  F = SDL_SCANCODE_F,
-  H = SDL_SCANCODE_H,
-  J = SDL_SCANCODE_J,
-  K = SDL_SCANCODE_K,
-  L = SDL_SCANCODE_L,
-  E = SDL_SCANCODE_E,
-  W = SDL_SCANCODE_W,
-  U = SDL_SCANCODE_U,
-  I = SDL_SCANCODE_I
+  A = SDLK_a,
+  S = SDLK_s,
+  D = SDLK_d,
+  F = SDLK_f,
+  H = SDLK_h,
+  J = SDLK_j,
+  K = SDLK_k,
+  L = SDLK_l,
+  E = SDLK_e,
+  W = SDLK_w,
+  U = SDLK_u,
+  I = SDLK_i
 } NOTE_KEYS;
 
 typedef enum {
