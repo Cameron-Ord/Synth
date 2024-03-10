@@ -10,7 +10,9 @@ Synth::Synth() {
   set_params();
   set_buffers();
   set_fir_filter();
+  set_biquad();
   set_adsr();
+  set_chorus();
   set_freeverb();
 }
 
@@ -21,7 +23,26 @@ Synth::~Synth() {
   delete frequencies;
 }
 
+void Synth::set_biquad() {
+  double nyquist = static_cast<double>(SR) / 2;
+  filt_len = 5;
+  stk::BiQuad::setSampleRate(SR);
+  coeffs = generate_hcoefficients(filt_len);
+  biquad.setCoefficients(coeffs[0], coeffs[1], coeffs[2], coeffs[3], coeffs[4],
+                         true);
+  biquad.setResonance(440.0, 0.2, false);
+  biquad.phaseDelay(nyquist * 0.2);
+}
+
+void Synth::set_chorus() {
+  stk::Chorus::setSampleRate(SR);
+  chorus.setModDepth(0.02);
+  chorus.setModFrequency(0.04);
+  chorus.setEffectMix(0.15);
+}
+
 void Synth::set_fir_filter() {
+  stk::Fir::setSampleRate(SR);
   filt_len = 150;
   coeffs = generate_hcoefficients(filt_len);
   std::vector<stk::StkFloat> coeff_vector;
@@ -47,6 +68,7 @@ void Synth::set_adsr() {
 }
 
 void Synth::set_freeverb() {
+  stk::FreeVerb::setSampleRate(SR);
   verb.setEffectMix(0.6);
   verb.setRoomSize(0.6);
   verb.setDamping(0.3);

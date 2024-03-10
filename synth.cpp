@@ -104,7 +104,9 @@ void Synth::create_sample_buffer() {
       if (sample < 0.0 || sample > 0.0) {
         buffers.first[f] = normalize_sample(sample, max);
         buffers.first[f] *= INT16_MAX * 0.5;
-        buffers.second[f] = static_cast<int16_t>(buffers.first[f]);
+        double chorusd = chorus.tick(buffers.first[f], 0);
+        double biquadd = biquad.tick(chorusd);
+        buffers.second[f] = static_cast<int16_t>(biquadd);
       } else {
         buffers.second[f] = 0;
       }

@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stk/ADSR.h>
+#include <stk/BiQuad.h>
+#include <stk/Chorus.h>
 #include <stk/Filter.h>
 #include <stk/Fir.h>
 #include <stk/FreeVerb.h>
@@ -56,8 +58,10 @@ class Synth {
 public:
   Synth();
   ~Synth();
+  void set_biquad();
   double handle_envelope_gen(double time);
   double set_attack_env(double time);
+  void set_chorus();
   double set_decay_env(double time);
   double set_sustain_env();
   void set_fir_filter();
@@ -95,6 +99,8 @@ private:
   double RT;
   double *coeffs;
   stk::Fir filter;
+  stk::Chorus chorus;
+  stk::BiQuad biquad;
   int filt_len;
   stk::ADSR adsr;
   stk::FreeVerb verb;
