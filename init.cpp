@@ -1,17 +1,27 @@
 #include "inc/main.hpp"
+#include <SDL2/SDL_audio.h>
 
-Initializer::Initializer(std::set<int> *err) {
+Initializer::Initializer(std::set<int> *err, Synth *syn) {
   init_sdl(err);
   create_window(err);
   create_renderer(err);
-  create_spec();
+  create_spec(syn);
   create_dev(err);
+  open_audio();
+  run_synth(syn);
 }
 Initializer::~Initializer() {
+  SDL_PauseAudio(1);
+  SDL_PauseAudioDevice(dev, 1);
   SDL_DestroyRenderer(r);
   SDL_DestroyWindow(w);
   SDL_CloseAudio();
   SDL_CloseAudioDevice(dev);
+}
+
+void Initializer::open_audio() {
+  SDL_PauseAudioDevice(dev, 0);
+  SDL_PauseAudio(0);
 }
 
 void Initializer::init_sdl(std::set<int> *err) {
@@ -44,11 +54,13 @@ void Initializer::create_renderer(std::set<int> *err) {
   err->insert(0);
 }
 
-void Initializer::create_spec() {
+void Initializer::create_spec(Synth *syn) {
   spec.freq = SR;
   spec.format = AUDIO_S16;
   spec.channels = 1;
   spec.samples = BL;
+  spec.callback = audio_callback;
+  spec.userdata = syn;
 }
 
 void Initializer::create_dev(std::set<int> *err) {
@@ -60,6 +72,16 @@ void Initializer::create_dev(std::set<int> *err) {
   err->insert(0);
 }
 
+void Initializer::run_synth(Synth *syn) {
+  Renderer renderer;
+  int *running = syn->get_run_state();
+  *running = 1;
+  while (*running) {
+    syn->poll_events();
+    syn->create_sample_buffer();
+    renderer.do_render(this, syn);
+  }
+}
 SDL_AudioDeviceID Initializer::get_device() { return dev; }
 SDL_AudioSpec *Initializer::get_spec() { return &spec; }
 SDL_Window *Initializer::get_window() { return w; }

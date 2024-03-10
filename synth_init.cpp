@@ -1,21 +1,19 @@
 #include "inc/main.hpp"
 #include "inc/scancodes.hpp"
-#include <SDL2/SDL_keyboard.h>
-#include <SDL2/SDL_scancode.h>
-#include <utility>
 
-Synth::Synth(Initializer *init) {
+Synth::Synth() {
+  buffer_enabled = 0;
   running = 0;
-  add_spec_values(init->get_spec());
   set_frequencies();
   set_params();
   set_buffers();
-  run_synth(init);
 }
 
-void Synth::add_spec_values(SDL_AudioSpec *spec) {
-  spec->userdata = this;
-  spec->callback = audio_callback;
+Synth::~Synth() {
+  delete[] buffers.first;
+  delete[] buffers.second;
+  delete playing_freqs;
+  delete frequencies;
 }
 
 void Synth::set_frequencies() {
@@ -25,10 +23,12 @@ void Synth::set_frequencies() {
   };
   base_km = {A, S, D, F, W, E, H, J, K, L, U, I};
   notes_len = base_freqs.size();
+
+  frequencies = new std::map<int, std::pair<double, double>>;
   for (size_t i = 0; i < notes_len; i++) {
     int KEY = base_km[i];
     double NOTE = base_freqs[i];
-    frequencies.emplace(KEY, std::make_pair(NOTE, 0));
+    frequencies->emplace(KEY, std::make_pair(NOTE, 0.0));
   }
   printf("\n\n");
   for (size_t j = 0; j < notes_len / 2; j++) {
@@ -36,11 +36,17 @@ void Synth::set_frequencies() {
            *SDL_GetKeyName(base_km[j]), base_freqs[j],
            *SDL_GetKeyName(base_km[j + 1]), base_freqs[j + 1]);
   }
+  playing_freqs = new std::vector<std::pair<double, double *>>;
 }
 
 void Synth::set_buffers() {
-  double DBUFFER[BL];
-  int16_t SBUFFER[BL];
+  double *DBUFFER = new double[BL];
+  int16_t *SBUFFER = new int16_t[BL];
+  // setting both buffers to 0 to on start.
+  for (int i = 0; i < BL; i++) {
+    DBUFFER[i] = 0.0;
+    SBUFFER[i] = 0;
+  }
   buffers = std::make_pair(DBUFFER, SBUFFER);
 }
 
@@ -58,13 +64,8 @@ void Synth::set_params() {
          "---------------------\n");
 }
 
+int Synth::get_enabled_state() { return buffer_enabled; }
+int *Synth::get_run_state() { return &running; }
 std::map<std::string, double> Synth::get_params() { return params; }
 
 std::pair<double *, int16_t *> Synth::get_buffers() { return buffers; }
-
-void Synth::run_synth(Initializer *init) {
-  running = 1;
-  while (running) {
-    poll_events();
-  }
-}

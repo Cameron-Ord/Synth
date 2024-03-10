@@ -1,6 +1,8 @@
 #pragma once
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_audio.h>
+#include <SDL2/SDL_keyboard.h>
+#include <SDL2/SDL_scancode.h>
 #include <cstdint>
 #include <map>
 #include <set>
@@ -11,6 +13,7 @@
 #include <stk/Fir.h>
 #include <stk/FreeVerb.h>
 #include <stk/Stk.h>
+#include <utility>
 #include <vector>
 
 #define SR 44100
@@ -27,12 +30,15 @@ class Inputs;
 
 class Initializer {
 public:
-  Initializer(std::set<int> *err);
+  Initializer(std::set<int> *err, Synth *syn);
   ~Initializer();
+
+  void run_synth(Synth *syn);
+  void open_audio();
   void init_sdl(std::set<int> *err);
   void create_window(std::set<int> *err);
   void create_renderer(std::set<int> *err);
-  void create_spec();
+  void create_spec(Synth *syn);
   void create_dev(std::set<int> *err);
   SDL_Window *get_window();
   SDL_Renderer *get_renderer();
@@ -42,41 +48,61 @@ public:
 private:
   SDL_Window *w;
   SDL_Renderer *r;
-  SDL_AudioDeviceID dev;
   SDL_AudioSpec spec;
+  SDL_AudioDeviceID dev;
 };
 
 class Synth {
 public:
-  Synth(Initializer *init);
+  Synth();
   ~Synth();
+  double get_max_value(double sample, double max);
+  double normalize_sample(double sample, double absmax);
+  void create_sample_buffer();
   void poll_events();
   void keydown(int KEYCODE);
   void keyup(int KEYCODE);
   void set_frequencies();
   void set_buffers();
   void set_params();
-  void run_synth(Initializer *init);
-  void add_spec_values(SDL_AudioSpec *spec);
-  void handle_synth_key(double freq, int *playing);
+  double w(double freq);
+  double generate_wave(double freq, double time);
+  void synth_key_on(double freq, double *time);
+  void synth_key_off(double freq, double *time);
+  double generate_sample();
+  int get_enabled_state();
+  int *get_run_state();
+
   std::pair<double *, int16_t *> get_buffers();
   std::map<std::string, double> get_params();
+  int buffer_enabled;
 
 private:
   int running;
   std::vector<int> base_km;
   std::vector<double> base_freqs;
   size_t notes_len;
-  // vector that will be added to, or removed from based on inputs. Used for
-  // iteratively generating samples
-  std::vector<std::pair<double, int>> playing_freqs;
+  /*
+   vector that will be added to, or removed from based on inputs. Used for
+   iteratively generating samples
+   usefull in that I dont have to interate 12 times to check if a note is
+   playing, only for the size of the vector
+  */
+  std::vector<std::pair<double, double *>> *playing_freqs;
+
   // buffer pair
   std::pair<double *, int16_t *> buffers;
   // mapping params to their names
   std::map<std::string, double> params;
   // mapping the frequencies to scancodes
-  std::map<int, std::pair<double, int>> frequencies;
+  std::map<int, std::pair<double, double>> *frequencies;
   // set to track held keys.
   std::set<int> held_keys;
 };
-class Renderer {};
+
+class Renderer {
+public:
+  void do_render(Initializer *init, Synth *syn);
+
+private:
+};
