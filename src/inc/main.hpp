@@ -58,7 +58,6 @@ class Synth {
 public:
   Synth();
   ~Synth();
-  void set_biquad();
   double handle_envelope_gen(double time);
   double set_attack_env(double time);
   void set_chorus();
@@ -66,7 +65,6 @@ public:
   double set_sustain_env();
   void set_fir_filter();
   void set_adsr();
-  void set_freeverb();
   double get_max_value(double sample, double max);
   double normalize_sample(double sample, double absmax);
   void create_sample_buffer();
@@ -87,7 +85,6 @@ public:
   double *generate_kcoefficients(int filter_length, double beta);
   double *hamming_window(int filter_length);
   double *generate_hcoefficients(int filter_length);
-
   std::pair<double *, int16_t *> get_buffers();
   std::map<std::string, double> get_params();
   int buffer_enabled;

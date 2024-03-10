@@ -10,10 +10,8 @@ Synth::Synth() {
   set_params();
   set_buffers();
   set_fir_filter();
-  set_biquad();
   set_adsr();
   set_chorus();
-  set_freeverb();
 }
 
 Synth::~Synth() {
@@ -23,39 +21,21 @@ Synth::~Synth() {
   delete frequencies;
 }
 
-void Synth::set_biquad() {
-  double nyquist = static_cast<double>(SR) / 2;
-  filt_len = 5;
-  stk::BiQuad::setSampleRate(SR);
-  coeffs = generate_hcoefficients(filt_len);
-  biquad.setCoefficients(coeffs[0], coeffs[1], coeffs[2], coeffs[3], coeffs[4],
-                         true);
-  biquad.setResonance(440.0, 0.2, false);
-  biquad.phaseDelay(nyquist * 0.2);
-}
-
 void Synth::set_chorus() {
-  stk::Chorus::setSampleRate(SR);
+  chorus.setSampleRate(static_cast<double>(SR));
   chorus.setModDepth(0.02);
   chorus.setModFrequency(0.04);
-  chorus.setEffectMix(0.15);
+  chorus.setEffectMix(0.20);
 }
 
 void Synth::set_fir_filter() {
-  stk::Fir::setSampleRate(SR);
-  filt_len = 150;
+  filter.setSampleRate(static_cast<double>(SR));
+  filt_len = 100;
   coeffs = generate_hcoefficients(filt_len);
   std::vector<stk::StkFloat> coeff_vector;
   for (int i = 0; i < filt_len; i++) {
     coeff_vector.push_back(static_cast<stk::StkFloat>(coeffs[i]));
   }
-  printf("-----------------------------------------------------------\n");
-  for (size_t j = 0; j < coeff_vector.size() / 4; j++) {
-    printf("COEFF : %6.3f || COEFF : %6.3f || COEFF : %6.3f || COEF : %6.3f\n",
-           coeff_vector[j], coeff_vector[j + 1], coeff_vector[j + 2],
-           coeff_vector[j + 3]);
-  }
-  printf("-----------------------------------------------------------\n");
   filter.setCoefficients(coeff_vector);
   delete[] coeffs;
 }
@@ -67,16 +47,12 @@ void Synth::set_adsr() {
   RT = 0.3;
 }
 
-void Synth::set_freeverb() {
-  stk::FreeVerb::setSampleRate(SR);
-  verb.setEffectMix(0.6);
-  verb.setRoomSize(0.6);
-  verb.setDamping(0.3);
-}
 void Synth::set_frequencies() {
   base_freqs = {
-      130.81, 138.59, 146.83, 155.56, 164.81, 174.61,
-      185.00, 196.00, 207.65, 220.00, 233.08, 246.94,
+      130.81 * pow(2.0, 1), 138.59 * pow(2.0, 1), 146.83 * pow(2.0, 1),
+      155.56 * pow(2.0, 1), 164.81 * pow(2.0, 1), 174.61 * pow(2.0, 1),
+      185.00 * pow(2.0, 1), 196.00 * pow(2.0, 1), 207.65 * pow(2.0, 1),
+      220.00 * pow(2.0, 1), 233.08 * pow(2.0, 1), 246.94 * pow(2.0, 1),
   };
   base_km = {A, S, D, F, W, E, H, J, K, L, U, I};
   notes_len = base_freqs.size();
