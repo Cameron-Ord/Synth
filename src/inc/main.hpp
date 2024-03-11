@@ -4,17 +4,11 @@
 #include <SDL2/SDL_keyboard.h>
 #include <SDL2/SDL_scancode.h>
 #include <cstdint>
+#include <iostream>
 #include <map>
 #include <set>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stk/ADSR.h>
-#include <stk/BiQuad.h>
-#include <stk/Chorus.h>
-#include <stk/Filter.h>
-#include <stk/Fir.h>
-#include <stk/FreeVerb.h>
-#include <stk/Stk.h>
 #include <utility>
 #include <vector>
 
@@ -58,12 +52,13 @@ class Synth {
 public:
   Synth();
   ~Synth();
+  double bit_crusher(double sample, int bit_depth);
+  void create_coefficients();
   double handle_envelope_gen(double time);
+  double hard_clip(double sample, double t);
   double set_attack_env(double time);
-  void set_chorus();
   double set_decay_env(double time);
   double set_sustain_env();
-  void set_fir_filter();
   void set_adsr();
   double get_max_value(double sample, double max);
   double normalize_sample(double sample, double absmax);
@@ -75,7 +70,10 @@ public:
   void set_buffers();
   void set_params();
   double w(double freq);
-  double generate_wave(double freq, double time);
+  double saw_wave(double freq, double time);
+  double sine_wave(double freq, double time);
+  double triangle_wave(double freq, double time);
+  double square_wave(double freq, double time);
   void synth_key_on(double freq, double *time);
   void synth_key_off(double freq, double *time);
   double generate_sample();
@@ -85,6 +83,7 @@ public:
   double *generate_kcoefficients(int filter_length, double beta);
   double *hamming_window(int filter_length);
   double *generate_hcoefficients(int filter_length);
+  double soft_clip(double sample, double amount);
   std::pair<double *, int16_t *> get_buffers();
   std::map<std::string, double> get_params();
   int buffer_enabled;
@@ -95,12 +94,7 @@ private:
   double SL;
   double RT;
   double *coeffs;
-  stk::Fir filter;
-  stk::Chorus chorus;
-  stk::BiQuad biquad;
   int filt_len;
-  stk::ADSR adsr;
-  stk::FreeVerb verb;
   double envelope;
   int running;
   std::vector<int> base_km;

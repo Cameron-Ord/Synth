@@ -4,6 +4,10 @@
  I attempted to do a kaiser window here, but I think I'm doing something
  horribly wrong, maybe I'll read about it later, but it's a little beyond me at
  the moment. For now the hamming_window is easier and more straightforward.
+
+ Regardless, these are pretty pointless to have, as im not using the
+ coefficients or anything from the window functions, since FIR filters arent
+ really necessary for what im doing. But it was good to learn.
 */
 
 double *Synth::kaiser_window(double beta, int filter_length) {

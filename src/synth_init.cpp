@@ -9,9 +9,8 @@ Synth::Synth() {
   set_frequencies();
   set_params();
   set_buffers();
-  set_fir_filter();
   set_adsr();
-  set_chorus();
+  create_coefficients();
 }
 
 Synth::~Synth() {
@@ -19,30 +18,16 @@ Synth::~Synth() {
   delete[] buffers.second;
   delete playing_freqs;
   delete frequencies;
+  delete coeffs;
 }
-
-void Synth::set_chorus() {
-  chorus.setSampleRate(static_cast<double>(SR));
-  chorus.setModDepth(0.02);
-  chorus.setModFrequency(0.04);
-  chorus.setEffectMix(0.20);
-}
-
-void Synth::set_fir_filter() {
-  filter.setSampleRate(static_cast<double>(SR));
+void Synth::create_coefficients() {
   filt_len = 100;
   coeffs = generate_hcoefficients(filt_len);
-  std::vector<stk::StkFloat> coeff_vector;
-  for (int i = 0; i < filt_len; i++) {
-    coeff_vector.push_back(static_cast<stk::StkFloat>(coeffs[i]));
-  }
-  filter.setCoefficients(coeff_vector);
-  delete[] coeffs;
 }
 
 void Synth::set_adsr() {
-  AT = 0.1;
-  DT = 0.2;
+  AT = 0.2;
+  DT = 0.4;
   SL = 0.8;
   RT = 0.3;
 }
