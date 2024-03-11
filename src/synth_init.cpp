@@ -1,7 +1,5 @@
 #include "inc/main.hpp"
 #include "inc/scancodes.hpp"
-#include <stk/Fir.h>
-#include <stk/Stk.h>
 
 Synth::Synth() {
   buffer_enabled = 0;
