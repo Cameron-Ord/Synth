@@ -8,4 +8,4 @@ A simple 3 layer sawwave synth, just uses bitcrusher distortion at 8 bit depth. 
 ```./b.sh```
 
 ## todo
-not much other than arbitrary restructuring of the code
+1. make things more configurable/changeable

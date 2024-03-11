@@ -31,6 +31,7 @@ int main() {
     inputs->poll_events(synth, rend, init);
     synth->create_sample_buffer();
     rend->do_render(init, synth);
+    SDL_Delay(16);
   }
 
   delete inputs;

@@ -116,7 +116,6 @@ class Renderer {
 public:
   Renderer();
   void do_render(Initializer *init, Synth *syn);
-  void check_win_resize(Initializer *init);
   void apply_win_resize(Initializer *init);
   void update_render_values();
 
