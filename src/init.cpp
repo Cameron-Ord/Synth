@@ -1,5 +1,6 @@
 #include "inc/main.hpp"
 #include <SDL2/SDL_audio.h>
+#include <SDL2/SDL_timer.h>
 
 Initializer::Initializer(std::set<int> *err, Synth *syn) {
   init_sdl(err);
@@ -83,6 +84,7 @@ void Initializer::run_synth(Synth *syn) {
     syn->poll_events();
     syn->create_sample_buffer();
     renderer.do_render(this, syn);
+    SDL_Delay(16);
   }
 }
 SDL_AudioDeviceID Initializer::get_device() { return dev; }

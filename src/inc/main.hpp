@@ -15,8 +15,8 @@
 #define SR 44100
 #define BL 2048
 #define NLEN 12
-#define BHEIGHT 600
-#define BWIDTH 800
+#define BHEIGHT 700
+#define BWIDTH 1200
 
 void audio_callback(void *userdata, Uint8 *stream, int bytes);
 

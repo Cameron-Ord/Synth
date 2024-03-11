@@ -63,6 +63,9 @@ void Synth::set_buffers() {
     SBUFFER[i] = 0;
   }
   buffers = std::make_pair(DBUFFER, SBUFFER);
+  printf("-----------------------------------------\n");
+  printf("BUFFER LENGTH : %d BUFFER SIZE : %ld\n", BL, sizeof(SBUFFER) * BL);
+  printf("-----------------------------------------\n");
 }
 
 void Synth::set_params() {
