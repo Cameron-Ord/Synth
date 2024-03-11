@@ -23,13 +23,12 @@ void audio_callback(void *userdata, Uint8 *stream, int bytes);
 class Initializer;
 class Synth;
 class Inputs;
+class Renderer;
 
 class Initializer {
 public:
-  Initializer(std::set<int> *err, Synth *syn);
+  Initializer(std::set<int> *err);
   ~Initializer();
-
-  void run_synth(Synth *syn);
   void open_audio();
   void init_sdl(std::set<int> *err);
   void create_window(std::set<int> *err);
@@ -63,10 +62,7 @@ public:
   double get_max_value(double sample, double max);
   double normalize_sample(double sample, double absmax);
   void create_sample_buffer();
-  void poll_events();
-  void keydown(int KEYCODE);
-  void keyup(int KEYCODE);
-  void set_frequencies();
+  void set_frequencies(std::vector<int> *base_km);
   void set_buffers();
   void set_params();
   double w(double freq);
@@ -74,8 +70,6 @@ public:
   double sine_wave(double freq, double time);
   double triangle_wave(double freq, double time);
   double square_wave(double freq, double time);
-  void synth_key_on(double freq, double *time);
-  void synth_key_off(double freq, double *time);
   double generate_sample();
   int get_enabled_state();
   int *get_run_state();
@@ -87,6 +81,9 @@ public:
   std::pair<double *, int16_t *> get_buffers();
   std::map<std::string, double> get_params();
   int buffer_enabled;
+  std::map<int, std::pair<double, double>> *get_freqs_map();
+  std::vector<std::pair<double, double *>> *get_playing_freqs();
+  void set_run_state(int r);
 
 private:
   double AT;
@@ -97,7 +94,6 @@ private:
   int filt_len;
   double envelope;
   int running;
-  std::vector<int> base_km;
   std::vector<double> base_freqs;
   size_t notes_len;
   /*
@@ -114,12 +110,38 @@ private:
   // mapping the frequencies to scancodes
   std::map<int, std::pair<double, double>> *frequencies;
   // set to track held keys.
-  std::set<int> held_keys;
 };
 
 class Renderer {
 public:
+  Renderer();
   void do_render(Initializer *init, Synth *syn);
+  void check_win_resize(Initializer *init);
+  void apply_win_resize(Initializer *init);
+  void update_render_values();
 
 private:
+  float cell_width;
+  float heightf;
+  int win_width;
+  int win_height;
+};
+
+class Inputs {
+public:
+  void poll_events(Synth *syn, Renderer *rend, Initializer *init);
+  void keydown(int KEYCODE, Synth *syn);
+  void keyup(int KEYCODE, Synth *syn);
+  void synth_key_on(double freq, double *time,
+                    std::vector<std::pair<double, double *>> *playing_freqs);
+  void synth_key_off(double freq, double *time,
+                     std::vector<std::pair<double, double *>> *playing_freqs);
+  std::set<int> *get_held_keys_ptr() { return &held_keys; }
+  std::set<int> get_held_keys() { return held_keys; }
+  std::vector<int> *get_base_km_ptr() { return &base_km; };
+  std::vector<int> get_base_km() { return base_km; };
+
+private:
+  std::set<int> held_keys;
+  std::vector<int> base_km;
 };

@@ -2,14 +2,10 @@
 #include <SDL2/SDL_audio.h>
 #include <SDL2/SDL_timer.h>
 
-Initializer::Initializer(std::set<int> *err, Synth *syn) {
+Initializer::Initializer(std::set<int> *err) {
   init_sdl(err);
   create_window(err);
   create_renderer(err);
-  create_spec(syn);
-  create_dev(err);
-  open_audio();
-  run_synth(syn);
 }
 Initializer::~Initializer() {
   SDL_PauseAudio(1);
@@ -41,7 +37,7 @@ void Initializer::create_window(std::set<int> *err) {
     err->insert(-1);
   }
   err->insert(0);
-  SDL_SetWindowResizable(this->w, SDL_FALSE);
+  SDL_SetWindowResizable(this->w, SDL_TRUE);
 }
 
 void Initializer::create_renderer(std::set<int> *err) {
@@ -73,20 +69,6 @@ void Initializer::create_dev(std::set<int> *err) {
   err->insert(0);
 }
 
-void Initializer::run_synth(Synth *syn) {
-  printf("-------------\n");
-  printf("STARTING SYNTH LOOP..\n");
-  printf("-------------\n");
-  Renderer renderer;
-  int *running = syn->get_run_state();
-  *running = 1;
-  while (*running) {
-    syn->poll_events();
-    syn->create_sample_buffer();
-    renderer.do_render(this, syn);
-    SDL_Delay(16);
-  }
-}
 SDL_AudioDeviceID Initializer::get_device() { return dev; }
 SDL_AudioSpec *Initializer::get_spec() { return &spec; }
 SDL_Window *Initializer::get_window() { return w; }

@@ -1,8 +1,24 @@
 #include "inc/main.hpp"
-#include <cstdint>
+#include <SDL2/SDL_events.h>
+#include <SDL2/SDL_video.h>
 
-float cell_width = static_cast<float>(BWIDTH) / BL;
-float heightf = static_cast<float>(BHEIGHT);
+Renderer::Renderer() {
+  win_height = BHEIGHT;
+  win_width = BWIDTH;
+  cell_width = static_cast<float>(win_width) / BL;
+  heightf = static_cast<float>(win_height);
+}
+
+void Renderer::update_render_values() {
+  cell_width = static_cast<float>(win_width) / BL;
+  heightf = static_cast<float>(win_height);
+}
+
+void Renderer::apply_win_resize(Initializer *init) {
+  SDL_GetWindowSize(init->get_window(), &win_width, &win_height);
+  update_render_values();
+}
+
 void Renderer::do_render(Initializer *init, Synth *syn) {
   SDL_SetRenderDrawColor(init->get_renderer(), 40, 42, 54, 0);
   SDL_RenderClear(init->get_renderer());

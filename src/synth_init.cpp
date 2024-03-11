@@ -4,7 +4,6 @@
 Synth::Synth() {
   buffer_enabled = 0;
   running = 0;
-  set_frequencies();
   set_params();
   set_buffers();
   set_adsr();
@@ -30,26 +29,36 @@ void Synth::set_adsr() {
   RT = 0.3;
 }
 
-void Synth::set_frequencies() {
+std::map<int, std::pair<double, double>> *Synth::get_freqs_map() {
+  return frequencies;
+}
+
+std::vector<std::pair<double, double *>> *Synth::get_playing_freqs() {
+  return playing_freqs;
+}
+
+void Synth::set_run_state(int r) { running = r; }
+
+void Synth::set_frequencies(std::vector<int> *base_km) {
   base_freqs = {
       130.81 * pow(2.0, 1), 138.59 * pow(2.0, 1), 146.83 * pow(2.0, 1),
       155.56 * pow(2.0, 1), 164.81 * pow(2.0, 1), 174.61 * pow(2.0, 1),
       185.00 * pow(2.0, 1), 196.00 * pow(2.0, 1), 207.65 * pow(2.0, 1),
       220.00 * pow(2.0, 1), 233.08 * pow(2.0, 1), 246.94 * pow(2.0, 1),
   };
-  base_km = {A, S, D, F, W, E, H, J, K, L, U, I};
+  *base_km = {A, S, D, F, W, E, H, J, K, L, U, I};
   notes_len = base_freqs.size();
   frequencies = new std::map<int, std::pair<double, double>>;
   for (size_t i = 0; i < notes_len; i++) {
-    int KEY = base_km[i];
+    int KEY = (*base_km)[i];
     double NOTE = base_freqs[i];
     frequencies->emplace(KEY, std::make_pair(NOTE, 0.0));
   }
   printf("\n\n");
   for (size_t j = 0; j < notes_len / 2; j++) {
     printf("KEY : %c -> NOTE : %f | KEY : %c -> NOTE : %f\n",
-           *SDL_GetKeyName(base_km[j]), base_freqs[j],
-           *SDL_GetKeyName(base_km[j + 1]), base_freqs[j + 1]);
+           *SDL_GetKeyName((*base_km)[j]), base_freqs[j],
+           *SDL_GetKeyName((*base_km)[j + 1]), base_freqs[j + 1]);
   }
   playing_freqs = new std::vector<std::pair<double, double *>>;
 }
