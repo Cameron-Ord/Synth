@@ -10,27 +10,26 @@
  really necessary for what im doing. But it was good to learn.
 */
 
-double *Synth::kaiser_window(double beta, int filter_length) {
-  double *window = new double[filter_length];
-  const double alpha = (filter_length - 1) / 2.0;
+double* Synth::kaiser_window(double beta, int filter_length) {
+  double*      window = new double[filter_length];
+  const double alpha  = (filter_length - 1) / 2.0;
   for (int n = 0; n < filter_length; ++n) {
-    window[n] = std::cyl_bessel_i(
-                    0, beta * std::sqrt(1 - std::pow((n - alpha) / alpha, 2))) /
+    window[n] = std::cyl_bessel_i(0, beta * std::sqrt(1 - std::pow((n - alpha) / alpha, 2))) /
                 std::cyl_bessel_i(0, beta);
   }
   return window;
 }
 
-double *Synth::generate_kcoefficients(int filter_length, double beta) {
-  double *coeffs = new double[filter_length];
-  double *kwincoeffs = kaiser_window(beta, filter_length);
-  double cutoff = 0.85;
+double* Synth::generate_kcoefficients(int filter_length, double beta) {
+  double* coeffs     = new double[filter_length];
+  double* kwincoeffs = kaiser_window(beta, filter_length);
+  double  cutoff     = 0.85;
 
   for (int i = 0; i < filter_length; ++i) {
     if (i == (filter_length - 1) / 2) {
       coeffs[i] = 2 * cutoff;
     } else {
-      double t = i - (static_cast<double>(filter_length) - 1) / 2;
+      double t  = i - (static_cast<double>(filter_length) - 1) / 2;
       coeffs[i] = sin(2 * M_PI * cutoff * t) / (M_PI * t);
     }
     coeffs[i] *= kwincoeffs[i];
@@ -45,17 +44,17 @@ double *Synth::generate_kcoefficients(int filter_length, double beta) {
  filter. 0.54 and 0.46 are constants typically used in this.
 */
 
-double *Synth::hamming_window(int filter_length) {
-  double *window = new double[filter_length];
+double* Synth::hamming_window(int filter_length) {
+  double* window = new double[filter_length];
   for (int n = 0; n < filter_length; ++n) {
     window[n] = 0.54 - 0.46 * cos(2 * M_PI * n / (filter_length - 1));
   }
   return window;
 }
 
-double *Synth::generate_hcoefficients(int filter_length) {
-  double *hcoeffs = new double[filter_length];
-  double *hwincoeffs = hamming_window(filter_length);
+double* Synth::generate_hcoefficients(int filter_length) {
+  double* hcoeffs    = new double[filter_length];
+  double* hwincoeffs = hamming_window(filter_length);
 
   /*
    Here the nyquist frequency is used to generate a cutoff frequency in Hz, so
@@ -65,7 +64,7 @@ double *Synth::generate_hcoefficients(int filter_length) {
   */
 
   double nyquist = static_cast<double>(SR) / 2.0;
-  double cutoff = nyquist * 0.2;
+  double cutoff  = nyquist * 0.2;
   printf("SET CUTOFF : %6.3f\n", cutoff);
   int m = (filter_length - 1) / 2;
   for (int n = 0; n < filter_length; ++n) {

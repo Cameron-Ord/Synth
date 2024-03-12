@@ -15,7 +15,19 @@ typedef enum {
   E = SDLK_e,
   W = SDLK_w,
   U = SDLK_u,
-  I = SDLK_i
+  I = SDLK_i,
+  Q = SDLK_q,
+  R = SDLK_r,
+  Y = SDLK_y,
+  O = SDLK_o,
+  Z = SDLK_z,
+  X = SDLK_x,
+  C = SDLK_c,
+  B = SDLK_b,
+  N = SDLK_n,
+  M = SDLK_m,
+  T = SDLK_t,
+  P = SDLK_p,
 } NOTE_KEYS;
 
 typedef enum {

@@ -1,6 +1,6 @@
 #include "inc/main.hpp"
 
-void cleanup(Synth *s, Initializer *i, Renderer *r, Inputs *in) {
+void cleanup(Synth* s, Initializer* i, Renderer* r, Inputs* in) {
   delete in;
   delete r;
   delete s;
@@ -11,11 +11,11 @@ void cleanup(Synth *s, Initializer *i, Renderer *r, Inputs *in) {
 int main() {
 
   std::set<int> err;
-  Renderer *rend = new Renderer();
-  Inputs *inputs = new Inputs();
-  Synth *synth = new Synth();
-  Initializer *init = new Initializer(&err);
-  synth->set_frequencies(inputs->get_base_km_ptr());
+  Renderer*     rend   = new Renderer();
+  Inputs*       inputs = new Inputs();
+  Synth*        synth  = new Synth();
+  Initializer*  init   = new Initializer(&err);
+  synth->set_frequencies(inputs->get_base_km_ptr(), inputs->get_alt_km_ptr());
   init->create_spec(synth);
   init->create_dev(&err);
   init->open_audio();

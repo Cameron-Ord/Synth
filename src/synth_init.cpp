@@ -1,9 +1,10 @@
 #include "inc/main.hpp"
 #include "inc/scancodes.hpp"
+#include <utility>
 
 Synth::Synth() {
   buffer_enabled = 0;
-  running = 0;
+  running        = 0;
   set_params();
   set_buffers();
   set_adsr();
@@ -19,7 +20,7 @@ Synth::~Synth() {
 }
 void Synth::create_coefficients() {
   filt_len = 100;
-  coeffs = generate_hcoefficients(filt_len);
+  coeffs   = generate_hcoefficients(filt_len);
 }
 
 void Synth::set_adsr() {
@@ -29,43 +30,43 @@ void Synth::set_adsr() {
   RT = 0.3;
 }
 
-std::map<int, std::pair<double, double>> *Synth::get_freqs_map() {
-  return frequencies;
-}
+std::map<int, std::pair<double, double>>* Synth::get_freqs_map() { return frequencies; }
 
-std::vector<std::pair<double, double *>> *Synth::get_playing_freqs() {
-  return playing_freqs;
-}
+std::vector<std::pair<double, double*>>* Synth::get_playing_freqs() { return playing_freqs; }
 
 void Synth::set_run_state(int r) { running = r; }
 
-void Synth::set_frequencies(std::vector<int> *base_km) {
+void Synth::set_frequencies(std::vector<int>* base_km, std::vector<int>* alt_km) {
   base_freqs = {
-      130.81 * pow(2.0, 1), 138.59 * pow(2.0, 1), 146.83 * pow(2.0, 1),
-      155.56 * pow(2.0, 1), 164.81 * pow(2.0, 1), 174.61 * pow(2.0, 1),
-      185.00 * pow(2.0, 1), 196.00 * pow(2.0, 1), 207.65 * pow(2.0, 1),
-      220.00 * pow(2.0, 1), 233.08 * pow(2.0, 1), 246.94 * pow(2.0, 1),
+      130.81, 138.59, 146.83, 155.56, 164.81, 174.61,
+      185.00, 196.00, 207.65, 220.00, 233.08, 246.94,
   };
-  *base_km = {A, S, D, F, W, E, H, J, K, L, U, I};
-  notes_len = base_freqs.size();
+  *base_km    = {A, S, D, F, W, E, H, J, K, L, U, I};
+  *alt_km     = {Q, R, T, Z, X, C, B, N, M, Y, O, P};
+  notes_len   = base_freqs.size();
   frequencies = new std::map<int, std::pair<double, double>>;
-  for (size_t i = 0; i < notes_len; i++) {
-    int KEY = (*base_km)[i];
-    double NOTE = base_freqs[i];
-    frequencies->emplace(KEY, std::make_pair(NOTE, 0.0));
+  for (size_t i = 0; i < notes_len * 2; i++) {
+    if (i < 11) {
+      int    KEY  = (*base_km)[i];
+      double NOTE = base_freqs[i] * pow(2.0, 1);
+      frequencies->emplace(KEY, std::make_pair(NOTE, 0.0));
+    } else if (i > 11 && i < (notes_len * 2)) {
+      int    KEY  = (*alt_km)[i - notes_len];
+      double NOTE = base_freqs[i - notes_len];
+      frequencies->emplace(KEY, std::make_pair(NOTE, 0.0));
+    }
   }
   printf("\n\n");
   for (size_t j = 0; j < notes_len / 2; j++) {
-    printf("KEY : %c -> NOTE : %f | KEY : %c -> NOTE : %f\n",
-           *SDL_GetKeyName((*base_km)[j]), base_freqs[j],
-           *SDL_GetKeyName((*base_km)[j + 1]), base_freqs[j + 1]);
+    printf("KEY : %c -> NOTE : %f | KEY : %c -> NOTE : %f\n", *SDL_GetKeyName((*base_km)[j]),
+           base_freqs[j], *SDL_GetKeyName((*base_km)[j + 1]), base_freqs[j + 1]);
   }
-  playing_freqs = new std::vector<std::pair<double, double *>>;
+  playing_freqs = new std::vector<std::pair<double, double*>>;
 }
 
 void Synth::set_buffers() {
-  double *DBUFFER = new double[BL];
-  int16_t *SBUFFER = new int16_t[BL];
+  double*  DBUFFER = new double[BL];
+  int16_t* SBUFFER = new int16_t[BL];
   // setting both buffers to 0 to on start.
   for (int i = 0; i < BL; i++) {
     DBUFFER[i] = 0.0;
@@ -84,15 +85,14 @@ void Synth::set_params() {
   params.emplace("time_step", (1.0 / SR));
   printf("---------------------------------------------------------------------"
          "---------------------\n");
-  printf("TEMPO : %f, BEAT DURATION : %f, NOTE DURATION : %f, TIME STEP : %f\n",
-         params["tempo"], params["beat_duration"], params["note_duration"],
-         params["time_step"]);
+  printf("TEMPO : %f, BEAT DURATION : %f, NOTE DURATION : %f, TIME STEP : %f\n", params["tempo"],
+         params["beat_duration"], params["note_duration"], params["time_step"]);
   printf("---------------------------------------------------------------------"
          "---------------------\n");
 }
 
-int Synth::get_enabled_state() { return buffer_enabled; }
-int *Synth::get_run_state() { return &running; }
+int                           Synth::get_enabled_state() { return buffer_enabled; }
+int*                          Synth::get_run_state() { return &running; }
 std::map<std::string, double> Synth::get_params() { return params; }
 
-std::pair<double *, int16_t *> Synth::get_buffers() { return buffers; }
+std::pair<double*, int16_t*> Synth::get_buffers() { return buffers; }
