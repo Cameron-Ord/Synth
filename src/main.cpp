@@ -1,28 +1,20 @@
 #include "inc/main.hpp"
 
-void cleanup(Synth* s, Initializer* i, Renderer* r, Inputs* in) {
-  delete in;
-  delete r;
-  delete s;
-  delete i;
-  SDL_Quit();
-}
-
 int main() {
-
   std::set<int> err;
-  Renderer*     rend   = new Renderer();
+  SDL_State*    init   = new SDL_State(&err);
   Inputs*       inputs = new Inputs();
   Synth*        synth  = new Synth();
-  Initializer*  init   = new Initializer(&err);
-  synth->set_frequencies(inputs->get_base_km_ptr(), inputs->get_alt_km_ptr());
+  Renderer*     rend   = new Renderer();
+  synth->set_defaults(inputs->get_base_km_ptr(), inputs->get_alt_km_ptr());
   init->create_spec(synth);
   init->create_dev(&err);
   init->open_audio();
   auto iter = err.find(-1);
   if (iter != err.end()) {
-    printf("SDL FAILED TO INITIALIZE, PERFORMING CLEANUP AND EXITING\n");
-    cleanup(synth, init, rend, inputs);
+    printf("SDL FAILED TO INIT.\n");
+    cleanup(init, inputs, synth, rend);
+    SDL_Quit();
     return 1;
   }
 
@@ -33,11 +25,14 @@ int main() {
     rend->do_render(init, synth);
     SDL_Delay(16);
   }
-
-  delete inputs;
-  delete rend;
-  delete synth;
-  delete init;
+  cleanup(init, inputs, synth, rend);
   SDL_Quit();
   return 0;
 }
+
+void cleanup(SDL_State* st, Inputs* in, Synth* syn, Renderer* ren) {
+  delete ren;
+  delete in;
+  delete syn;
+  delete st;
+};

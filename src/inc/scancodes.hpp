@@ -1,7 +1,5 @@
 #pragma once
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_keycode.h>
-#include <SDL2/SDL_video.h>
 
 typedef enum {
   A = SDLK_a,
@@ -29,11 +27,3 @@ typedef enum {
   T = SDLK_t,
   P = SDLK_p,
 } NOTE_KEYS;
-
-typedef enum {
-  RESIZED = SDL_WINDOWEVENT_RESIZED,
-} WIN_EVENTS;
-
-typedef enum {
-
-} CONFIG_KEYS;
