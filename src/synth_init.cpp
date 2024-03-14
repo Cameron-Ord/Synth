@@ -44,24 +44,23 @@ void Synth::set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km) {
   *alt_km   = {Q, R, T, Z, X, C, B, N, M, Y, O, P};
   notes_len = base_freqs.size();
   freq_map  = new std::map<int, Freq_Data>;
-  for (size_t i = 0; i < notes_len * 2; i++) {
-    if (i < 11) {
-      Freq_Data fd;
-      int       KEY  = (*base_km)[i];
-      double    NOTE = base_freqs[i] * pow(2.0, 1);
-      fd.freq        = NOTE;
-      fd.is_dead     = 1;
-      fd.time        = 0.0;
-      freq_map->emplace(KEY, fd);
-    } else if (i > 11 && i < (notes_len * 2)) {
-      Freq_Data fd;
-      int       KEY  = (*alt_km)[i - notes_len];
-      double    NOTE = base_freqs[i - notes_len];
-      fd.freq        = NOTE;
-      fd.is_dead     = 1;
-      fd.time        = 0.0;
-      freq_map->emplace(KEY, fd);
-    }
+  for (size_t i = 0; i < notes_len; i++) {
+    Freq_Data fd;
+    int       KEY  = (*base_km)[i];
+    double    NOTE = base_freqs[i] * pow(2.0, 1);
+    fd.freq        = NOTE;
+    fd.is_dead     = 1;
+    fd.time        = 0.0;
+    freq_map->emplace(KEY, fd);
+  }
+  for (int i = 0; i < notes_len; i++) {
+    Freq_Data fd;
+    int       KEY  = (*alt_km)[i];
+    double    NOTE = base_freqs[i];
+    fd.freq        = NOTE;
+    fd.is_dead     = 1;
+    fd.time        = 0.0;
+    freq_map->emplace(KEY, fd);
   }
 }
 
