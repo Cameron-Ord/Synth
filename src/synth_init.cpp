@@ -1,5 +1,6 @@
 #include "inc/main.hpp"
 #include "inc/scancodes.hpp"
+#include <SDL2/SDL_keyboard.h>
 Synth::Synth() {
   buffer_enabled = 0;
   running        = 0;
@@ -61,6 +62,10 @@ void Synth::set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km) {
     fd.is_dead     = 1;
     fd.time        = 0.0;
     freq_map->emplace(KEY, fd);
+  }
+
+  for (const auto& pair : *freq_map) {
+    printf("KEY : %s  NOTE : %6.2f\n", SDL_GetKeyName(pair.first), pair.second.freq);
   }
 }
 
