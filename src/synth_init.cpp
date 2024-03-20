@@ -12,6 +12,7 @@ Synth::~Synth() {
   delete[] fbuffer;
   delete[] sbuffer;
   delete freq_map;
+  delete c_freq_map;
   delete adsr;
   delete samples;
 }
@@ -36,15 +37,19 @@ void Synth::set_buffers() {
 }
 
 void Synth::set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km) {
-  t          = 1.0 / SR;
-  base_freqs = {
+  note_duration = (60.0 / 100.0) / 1;
+  t             = 1.0 / SR;
+  ttl_time[0]   = 0.0;
+  ttl_time[1]   = 0.0;
+  base_freqs    = {
       130.81, 138.59, 146.83, 155.56, 164.81, 174.61,
       185.00, 196.00, 207.65, 220.00, 233.08, 246.94,
   };
-  *base_km  = {A, S, D, F, W, E, H, J, K, L, U, I};
-  *alt_km   = {Q, R, T, Z, X, C, B, N, M, Y, O, P};
-  notes_len = base_freqs.size();
-  freq_map  = new std::map<int, Freq_Data>;
+  *base_km   = {A, S, D, F, W, E, H, J, K, L, U, I};
+  *alt_km    = {Q, R, T, Z, X, C, B, N, M, Y, O, P};
+  notes_len  = base_freqs.size();
+  freq_map   = new std::map<int, Freq_Data>;
+  c_freq_map = new std::map<int, Freq_Data>;
   for (size_t i = 0; i < notes_len; i++) {
     Freq_Data fd;
     int       KEY  = (*base_km)[i];
@@ -53,6 +58,7 @@ void Synth::set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km) {
     fd.is_dead     = 1;
     fd.time        = 0.0;
     freq_map->emplace(KEY, fd);
+    c_freq_map->emplace(KEY, fd);
   }
   for (int i = 0; i < notes_len; i++) {
     Freq_Data fd;
@@ -62,6 +68,7 @@ void Synth::set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km) {
     fd.is_dead     = 1;
     fd.time        = 0.0;
     freq_map->emplace(KEY, fd);
+    c_freq_map->emplace(KEY, fd);
   }
 
   for (const auto& pair : *freq_map) {

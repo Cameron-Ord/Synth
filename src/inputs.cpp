@@ -1,5 +1,6 @@
 
 #include "inc/main.hpp"
+#include <SDL2/SDL_keycode.h>
 #include <cstdio>
 
 void Inputs::poll_events(Synth* syn, Renderer* rend, SDL_State* init) {
@@ -7,7 +8,14 @@ void Inputs::poll_events(Synth* syn, Renderer* rend, SDL_State* init) {
   while (SDL_PollEvent(&e)) {
     switch (e.type) {
     case SDL_KEYDOWN: {
-      keydown(e.key.keysym.sym, syn);
+      if (e.key.keysym.sym == SDLK_ESCAPE) {
+        clear_chord_pipe(syn);
+      }
+      if (SDL_GetModState() & KMOD_SHIFT) {
+        chord_keydown(e.key.keysym.sym, syn);
+      } else {
+        keydown(e.key.keysym.sym, syn);
+      }
       break;
     }
     case SDL_KEYUP: {
@@ -41,6 +49,43 @@ void Inputs::poll_events(Synth* syn, Renderer* rend, SDL_State* init) {
     default:
       break;
     }
+  }
+}
+
+void Inputs::clear_chord_pipe(Synth* syn) {
+  std::map<int, Freq_Data>* cf = syn->get_cfreq_map();
+  for (auto& pair : *cf) {
+    Freq_Data* fptr = &pair.second;
+    if (!fptr->is_dead) {
+      fptr->is_dead = 1;
+    }
+  }
+  held_chord_keys.clear();
+}
+
+void Inputs::chord_keydown(int KEYCODE, Synth* syn) {
+  auto HELD_ITER = held_chord_keys.find(KEYCODE);
+  if (HELD_ITER != held_chord_keys.end()) {
+    chord_key_off(KEYCODE, syn);
+    held_chord_keys.erase(KEYCODE);
+    return;
+  }
+
+  std::map<int, Freq_Data>* cf      = syn->get_cfreq_map();
+  auto                      KM_ITER = cf->find(KEYCODE);
+  if (KM_ITER != cf->end()) {
+    chord_key_on(&KM_ITER->second);
+    held_chord_keys.insert(KEYCODE);
+  }
+}
+
+void Inputs::chord_key_on(Freq_Data* cfd) { cfd->is_dead = 0; }
+
+void Inputs::chord_key_off(int KEYCODE, Synth* syn) {
+  std::map<int, Freq_Data>* cf      = syn->get_cfreq_map();
+  auto                      KM_ITER = cf->find(KEYCODE);
+  if (KM_ITER != cf->end()) {
+    KM_ITER->second.is_dead = 1;
   }
 }
 

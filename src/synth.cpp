@@ -11,7 +11,13 @@ void Synth::create_sample_buffer() {
         max        = get_max_value(sample, max);
         fbuffer[i] = sample;
       }
+      ttl_time[0] += t;
+      ttl_time[1] += t;
+      if (ttl_time[1] >= note_duration) {
+        ttl_time[1] = 0.0;
+      }
     }
+
     for (int f = 0; f < BL; f++) {
       double sample = fbuffer[f];
       if (sample < 0.0 || sample > 0.0) {
@@ -31,24 +37,33 @@ double Synth::generate_sample() {
   for (auto& pair : *freq_map) {
     Freq_Data* fptr = &pair.second;
     if (!fptr->is_dead) {
-      double wave     = create_layered_wave(fptr->freq, fptr->time);
+      double wave     = create_layered_wave(fptr->freq, ttl_time[0]);
       double envelope = handle_envelope_gen(fptr->freq);
       sample += (wave * envelope);
-      fptr->time += t;
+    }
+  }
+  if (ttl_time[1] < note_duration) {
+    for (auto& pair : *c_freq_map) {
+      Freq_Data* fptr = &pair.second;
+      if (!fptr->is_dead) {
+        double wave     = create_layered_wave(fptr->freq, ttl_time[1]);
+        double envelope = handle_envelope_gen(fptr->freq);
+        sample += (wave * envelope) * 0.75;
+      }
     }
   }
   return sample;
 }
 
-double Synth::create_layered_wave(double freq, double time) {
+double Synth::create_chord_wave(double freq, double time) {
+  double saw_base = saw_wave(freq, time);
+  return bit_crusher(saw_base, 4);
+}
 
-  double saw_shift_neg = saw_wave(freq * (1.0 - 0.005), time);
+double Synth::create_layered_wave(double freq, double time) {
   double saw_shift_pos = saw_wave(freq * (1.0 + 0.005), time);
   double saw_base      = saw_wave(freq, time);
-
-  return ((bit_crusher(saw_base, 8) + bit_crusher(saw_shift_neg, 8) +
-           bit_crusher(saw_shift_pos, 8))) /
-         3;
+  return ((bit_crusher(saw_base, 4) + bit_crusher(saw_shift_pos, 4))) / 2;
 }
 
 double Synth::bit_crusher(double sample, int bit_depth) {

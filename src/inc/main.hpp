@@ -9,7 +9,7 @@
 #include <vector>
 
 #define SR 44100
-#define BL 1024
+#define BL 2048
 #define NOTELEN 12
 #define BHEIGHT 800
 #define BWIDTH 1200
@@ -66,6 +66,7 @@ public:
   double                    set_decay_env(double time);
   double                    set_sustain_env();
   double                    create_layered_wave(double freq, double time);
+  double                    create_chord_wave(double freq, double time);
   double                    get_max_value(double sample, double max);
   double                    normalize_sample(double sample, double absmax);
   double                    w(double freq);
@@ -82,9 +83,12 @@ public:
   double*                   get_fbuffer();
   int16_t*                  get_sbuffer();
   std::map<int, Freq_Data>* get_freq_map();
+  std::map<int, Freq_Data>* get_cfreq_map() { return c_freq_map; }
   int                       get_buffer_status();
 
 private:
+  double                    note_duration;
+  double                    ttl_time[2];
   double                    t;
   double*                   fbuffer;
   int16_t*                  sbuffer;
@@ -93,6 +97,7 @@ private:
   double*                   samples;
   std::vector<double>       base_freqs;
   std::map<int, Freq_Data>* freq_map;
+  std::map<int, Freq_Data>* c_freq_map;
   ADSR_PARAMS*              adsr;
   int                       notes_len;
 };
@@ -114,10 +119,14 @@ private:
 class Inputs {
 public:
   void              poll_events(Synth* syn, Renderer* rend, SDL_State* init);
+  void              clear_chord_pipe(Synth* syn);
   void              keydown(int KEYCODE, Synth* syn);
   void              keyup(int SCANCODE, Synth* syn);
   void              synth_key_on(Freq_Data* fd);
   void              synth_key_off(Freq_Data* fd);
+  void              chord_keydown(int KEYCODE, Synth* syn);
+  void              chord_key_on(Freq_Data* cfd);
+  void              chord_key_off(int KEYCODE, Synth* syn);
   std::set<int>*    get_held_keys_ptr() { return &held_keys; }
   std::set<int>     get_held_keys() { return held_keys; }
   std::vector<int>* get_base_km_ptr() { return &base_km; };
@@ -125,6 +134,7 @@ public:
   std::vector<int>* get_alt_km_ptr() { return &alt_km; }
 
 private:
+  std::set<int>    held_chord_keys;
   std::set<int>    held_keys;
   std::vector<int> base_km;
   std::vector<int> alt_km;
