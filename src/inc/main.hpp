@@ -92,6 +92,7 @@ private:
   double                    ttl_time[2];
   double                    t;
   double*                   fbuffer;
+  double*                   ffbuffer;
   int16_t*                  sbuffer;
   int                       running;
   int                       buffer_enabled;

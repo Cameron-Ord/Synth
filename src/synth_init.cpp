@@ -10,6 +10,7 @@ Synth::Synth() {
 
 Synth::~Synth() {
   delete[] fbuffer;
+  delete[] ffbuffer;
   delete[] sbuffer;
   delete freq_map;
   delete c_freq_map;
@@ -28,11 +29,14 @@ void Synth::set_adsr() {
 void Synth::set_buffers() {
   samples = new double[NOTELEN * 2];
   memset(samples, 0, sizeof(double) * NOTELEN);
-  fbuffer = new double[BL];
-  sbuffer = new int16_t[BL];
+  fbuffer  = new double[BL];
+  ffbuffer = new double[BL];
+  sbuffer  = new int16_t[BL * 2];
   for (int i = 0; i < BL; i++) {
-    fbuffer[i] = 0.0;
-    sbuffer[i] = 0;
+    fbuffer[i]     = 0.0;
+    ffbuffer[i]    = 0.0;
+    sbuffer[i]     = 0;
+    sbuffer[i + 1] = 0;
   }
 }
 

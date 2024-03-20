@@ -50,7 +50,7 @@ void SDL_State::create_renderer(std::set<int>* err) {
 void SDL_State::create_spec(Synth* syn) {
   spec.freq     = SR;
   spec.format   = AUDIO_S16;
-  spec.channels = 1;
+  spec.channels = 2;
   spec.samples  = BL;
   spec.callback = audio_cb;
   spec.userdata = syn;

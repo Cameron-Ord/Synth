@@ -26,9 +26,11 @@ void Synth::create_sample_buffer() {
       if (sample < 0.0 || sample > 0.0) {
         fbuffer[f] = normalize_sample(sample, max);
         fbuffer[f] *= INT16_MAX * 0.5;
-        sbuffer[f] = static_cast<int16_t>(fbuffer[f]);
+        sbuffer[f * 2]     = static_cast<int16_t>(fbuffer[f]);
+        sbuffer[f * 2 + 1] = static_cast<int16_t>(fbuffer[f]);
       } else {
-        sbuffer[f] = 0;
+        sbuffer[f * 2]     = 0;
+        sbuffer[f * 2 + 1] = 0;
       }
     }
     buffer_enabled = 1;
