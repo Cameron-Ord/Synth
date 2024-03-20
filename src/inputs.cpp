@@ -116,4 +116,7 @@ void Inputs::keyup(int KEYCODE, Synth* syn) {
 
 void Inputs::synth_key_on(Freq_Data* fd) { fd->is_dead = 0; }
 
-void Inputs::synth_key_off(Freq_Data* fd) { fd->is_dead = 1; }
+void Inputs::synth_key_off(Freq_Data* fd) {
+  fd->is_dead = 1;
+  fd->time    = 0.0;
+}
