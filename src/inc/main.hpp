@@ -64,6 +64,7 @@ public:
   double                    handle_envelope_gen(double time);
   double                    set_attack_env(double time);
   double                    set_decay_env(double time);
+  double                    generate_chord_sample();
   double                    set_sustain_env();
   double                    create_layered_wave(double freq, double time);
   double                    create_chord_wave(double freq, double time);

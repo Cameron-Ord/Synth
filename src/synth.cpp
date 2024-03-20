@@ -4,9 +4,12 @@ void Synth::create_sample_buffer() {
   if (!buffer_enabled) {
     double max = 0.0;
     for (int i = 0; i < BL; i++) {
-      double sample = 0.0;
-      fbuffer[i]    = sample;
-      sample        = generate_sample();
+      double sample       = 0.0;
+      double chord_sample = 0.0;
+      fbuffer[i]          = sample;
+      sample              = generate_sample();
+      chord_sample        = generate_chord_sample();
+      double ttl          = sample += chord_sample;
       if (sample < 0.0 || sample > 0.0) {
         max        = get_max_value(sample, max);
         fbuffer[i] = sample;
@@ -31,6 +34,18 @@ void Synth::create_sample_buffer() {
     buffer_enabled = 1;
   }
 }
+double Synth::generate_chord_sample() {
+  double sample = 0.0;
+  for (auto& pair : *c_freq_map) {
+    Freq_Data* fptr = &pair.second;
+    if (!fptr->is_dead) {
+      double wave     = create_layered_wave(fptr->freq, ttl_time[1]);
+      double envelope = handle_envelope_gen(fptr->freq);
+      sample += (wave * envelope) * 0.75;
+    }
+  }
+  return sample;
+}
 
 double Synth::generate_sample() {
   double sample = 0.0;
@@ -40,16 +55,6 @@ double Synth::generate_sample() {
       double wave     = create_layered_wave(fptr->freq, ttl_time[0]);
       double envelope = handle_envelope_gen(fptr->freq);
       sample += (wave * envelope);
-    }
-  }
-  if (ttl_time[1] < note_duration) {
-    for (auto& pair : *c_freq_map) {
-      Freq_Data* fptr = &pair.second;
-      if (!fptr->is_dead) {
-        double wave     = create_layered_wave(fptr->freq, ttl_time[1]);
-        double envelope = handle_envelope_gen(fptr->freq);
-        sample += (wave * envelope) * 0.75;
-      }
     }
   }
   return sample;
