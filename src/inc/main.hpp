@@ -68,20 +68,30 @@ public:
   double                    set_sustain_env();
   double                    create_layered_wave(double freq, double time);
   double                    create_chord_wave(double freq, double time);
-  double                    get_max_value(double sample, double max);
-  double                    normalize_sample(double sample, double absmax);
   double                    w(double freq);
   double                    saw_wave(double freq, double time);
   double                    generate_sample();
   void                      set_adsr();
+  void                      set_max_value(double sample, double* max);
+  void                      normalize_sample(double* sample, double absmax);
+  void                      fill_audio_output(int f);
+  void                      fill_with_zero(int f);
+  void                      process_left_sample(double* sample, double left_max);
+  void                      process_right_sample(double* sample, double right_max);
+  void                      update_time();
+  void                      update_left_max(double* lmax, double lsample);
+  void                      update_right_max(double* rmax, double rsample);
   void                      create_sample_buffer();
   void                      set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km);
   void                      set_buffers();
   void                      set_run_state(int r);
+  double                    create_left_sample();
+  double                    create_right_sample();
   int                       get_enabled_state();
   void                      set_enabled_state(int en);
   int*                      get_run_state();
-  double*                   get_fbuffer();
+  double*                   get_left_buffer() { return left_buffer; }
+  double*                   get_right_buffer() { return right_buffer; }
   int16_t*                  get_sbuffer();
   std::map<int, Freq_Data>* get_freq_map();
   std::map<int, Freq_Data>* get_cfreq_map() { return c_freq_map; }
@@ -91,8 +101,8 @@ private:
   double                    note_duration;
   double                    ttl_time[2];
   double                    t;
-  double*                   fbuffer;
-  double*                   ffbuffer;
+  double*                   left_buffer;
+  double*                   right_buffer;
   int16_t*                  sbuffer;
   int                       running;
   int                       buffer_enabled;

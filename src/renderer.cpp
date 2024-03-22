@@ -20,7 +20,7 @@ void Renderer::apply_win_resize(SDL_State* init) {
 void Renderer::do_render(SDL_State* init, Synth* syn) {
   SDL_SetRenderDrawColor(init->get_renderer(), 40, 42, 54, 0);
   SDL_RenderClear(init->get_renderer());
-  double*  fbuff = syn->get_fbuffer();
+  double*  fbuff = syn->get_left_buffer();
   int16_t* sbuff = syn->get_sbuffer();
 
   if (syn->get_enabled_state()) {

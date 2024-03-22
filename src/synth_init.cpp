@@ -9,13 +9,12 @@ Synth::Synth() {
 }
 
 Synth::~Synth() {
-  delete[] fbuffer;
-  delete[] ffbuffer;
+  delete[] left_buffer;
+  delete[] right_buffer;
   delete[] sbuffer;
   delete freq_map;
   delete c_freq_map;
   delete adsr;
-  delete samples;
 }
 
 void Synth::set_adsr() {
@@ -27,21 +26,16 @@ void Synth::set_adsr() {
 }
 
 void Synth::set_buffers() {
-  samples = new double[NOTELEN * 2];
-  memset(samples, 0, sizeof(double) * NOTELEN);
-  fbuffer  = new double[BL];
-  ffbuffer = new double[BL];
-  sbuffer  = new int16_t[BL * 2];
-  for (int i = 0; i < BL; i++) {
-    fbuffer[i]     = 0.0;
-    ffbuffer[i]    = 0.0;
-    sbuffer[i]     = 0;
-    sbuffer[i + 1] = 0;
-  }
+  left_buffer  = new double[BL];
+  right_buffer = new double[BL];
+  sbuffer      = new int16_t[BL * 2];
+  memset(left_buffer, 0, sizeof(double) * BL);
+  memset(right_buffer, 0, sizeof(double) * BL);
+  memset(sbuffer, 0, sizeof(int16_t) * (BL * 2));
 }
 
 void Synth::set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km) {
-  note_duration = (60.0 / 120.0) * 2;
+  note_duration = (60.0 / 120.0) * 4;
   t             = 1.0 / SR;
   ttl_time[0]   = 0.0;
   ttl_time[1]   = 0.0;
@@ -81,7 +75,6 @@ void Synth::set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km) {
 }
 
 std::map<int, Freq_Data>* Synth::get_freq_map() { return freq_map; }
-double*                   Synth::get_fbuffer() { return fbuffer; }
 int16_t*                  Synth::get_sbuffer() { return sbuffer; }
 int*                      Synth::get_run_state() { return &running; }
 int                       Synth::get_enabled_state() { return buffer_enabled; }
