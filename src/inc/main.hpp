@@ -60,6 +60,14 @@ class Synth {
 public:
   Synth();
   ~Synth();
+  double                    pulse_wave(double freq, double time, double duty_cycle);
+  double                    DRC(double sample, double threshold, double ratio);
+  double                    wave_fold(double sample, double amount);
+  double                    wave_shape(double sample);
+  double                    hard_clip(double sample, double threshold);
+  double                    fuzzer(double sample, double amount);
+  double                    phase_distort(double sample, double amount);
+  double                    square_wave(double freq, double time);
   double                    bit_crusher(double sample, int bit_depth);
   double                    handle_envelope_gen(double time);
   double                    set_attack_env(double time);

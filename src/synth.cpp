@@ -98,7 +98,7 @@ double Synth::generate_sample() {
     if (!fptr->is_dead) {
       double wave     = create_layered_wave(fptr->freq, ttl_time[0]);
       double envelope = handle_envelope_gen(fptr->freq);
-      sample += (wave * envelope);
+      sample += DRC((phase_distort(wave, 0.4) * envelope), 0.5, 2.5);
     }
   }
   return sample;
@@ -110,15 +110,50 @@ double Synth::create_chord_wave(double freq, double time) {
 }
 
 double Synth::create_layered_wave(double freq, double time) {
-  double saw_shift_pos = saw_wave(freq * (1.0 + 0.005), time);
   double saw_base      = saw_wave(freq, time);
-  return ((bit_crusher(saw_base, 16) + bit_crusher(saw_shift_pos, 16))) / 2;
+  double square_base   = square_wave(freq, time);
+  double pulse_base    = pulse_wave(freq, time, 0.75);
+  return pulse_base + saw_base;
 }
 
 double Synth::bit_crusher(double sample, int bit_depth) {
-  double step_size = 1.0 / (pow(2, bit_depth) - 1);
-  double quantized = round(sample / step_size) * step_size;
-  return quantized;
+  double max_value = pow(2, bit_depth) - 1;
+  return round(sample * max_value) / max_value;
+}
+
+double Synth::wave_shape(double sample){
+  return sin(sample * 2) * 0.5;
+}
+
+double Synth::wave_fold(double sample, double amount){
+  return amount * (2 * fabs(fmod(sample / amount + 1, 2.0)) - 1);
+}
+
+
+double Synth::fuzzer(double sample, double amount){
+    return tanh(sample * amount);
+}
+
+double Synth::hard_clip(double sample, double threshold){
+  if(sample > threshold){
+    return threshold;
+  } else if(sample < -threshold){
+    return -threshold;
+  } else {
+    return sample;
+  }
+}
+
+double Synth::phase_distort(double sample, double amount){
+  return sin(sample + amount * sin(sample));
+}
+
+double Synth::DRC(double sample, double threshold, double ratio){
+  if(sample > threshold){
+    return threshold + (sample - threshold) / ratio;
+  } else {
+    return sample;
+  }
 }
 
 void Synth::set_max_value(double sample, double* max) {
@@ -134,4 +169,19 @@ double Synth::w(double freq) { return 2.0 * freq * M_PI; }
 
 double Synth::saw_wave(double freq, double time) {
   return (2.0 / M_PI) * (freq * M_PI * fmod(time, 1.0 / freq) - (M_PI / 2.0));
+}
+ 
+double Synth::square_wave(double freq, double time){
+  return (sin(2*M_PI*freq*time) > 0) ? -1 : 1;
+}
+
+double Synth::pulse_wave(double freq, double time, double duty_cycle){
+  double period = 1.0 / freq;
+  double pulse_width = duty_cycle * period;
+  double normalized_time = fmod(time, period);
+  if(normalized_time < pulse_width){
+    return 1.0;
+  } else {
+    return -1.0;
+  }
 }

@@ -35,7 +35,7 @@ void Synth::set_buffers() {
 }
 
 void Synth::set_defaults(std::vector<int>* base_km, std::vector<int>* alt_km) {
-  note_duration = (60.0 / 120.0) * 4;
+  note_duration = (60.0 / 120.0);
   t             = 1.0 / SR;
   ttl_time[0]   = 0.0;
   ttl_time[1]   = 0.0;
