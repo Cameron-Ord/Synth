@@ -60,6 +60,8 @@ void Inputs::clear_chord_pipe(Synth* syn) {
       fptr->is_dead = 1;
     }
   }
+  double* time_ptr = syn->get_ttl_time();
+  *time_ptr        = 0.0;
   held_chord_keys.clear();
 }
 

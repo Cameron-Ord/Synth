@@ -104,6 +104,7 @@ public:
   std::map<int, Freq_Data>* get_freq_map();
   std::map<int, Freq_Data>* get_cfreq_map() { return c_freq_map; }
   int                       get_buffer_status();
+  double*                   get_ttl_time() { return &ttl_time[1]; }
 
 private:
   double                    note_duration;
