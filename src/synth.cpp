@@ -95,7 +95,7 @@ double Synth::generate_sample() {
     if (!fptr->is_dead) {
       double wave     = create_layered_wave(fptr->freq, ttl_time[0]);
       double envelope = handle_envelope_gen(fptr->freq);
-      sample += DRC((phase_distort(wave, 0.4) * envelope), 0.5, 2.5);
+      sample += DRC((bit_crusher(wave, 8) * envelope), 0.5, 2.5) * 0.8;
     }
   }
   return sample;
